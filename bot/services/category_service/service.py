@@ -1,7 +1,6 @@
-from bot.services.category_service.repositories.base import CategoryRepositoryBase
-from bot.services.user_service.repositories.base import UserRepositoryBase
+from .repositories.base import CategoryRepositoryBase
 
 
-class CategoryService(UserRepositoryBase):
+class CategoryService:
     def __init__(self, category_repo: CategoryRepositoryBase):
         self.category_repo = category_repo

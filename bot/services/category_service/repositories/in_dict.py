@@ -1,5 +1,5 @@
-from bot.models.category import CategoryModel
-from bot.services.category_service.repositories.base import CategoryRepositoryBase
+from models.category import CategoryModel
+from .base import CategoryRepositoryBase
 
 
 def _str_dict_to_category_structure(data: dict) -> dict:
@@ -47,7 +47,7 @@ def _str_dict_to_category_structure(data: dict) -> dict:
                 if length >= 2:
                     category.link = value[1]
                 if length >= 3:
-                    result.update(_handle(value[1], category.id))
+                    result.update(_handle(value[2], category.id))
         return result
 
     return _handle(data)
