@@ -39,3 +39,19 @@ async def category_keyboard(category: CategoryModel | None) -> InlineKeyboardMar
         )
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+
+yes_no_keyboard = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text='Да',
+                callback_data='yes',
+            ),
+            InlineKeyboardButton(
+                text='Нет',
+                callback_data='no',
+            ),
+        ],
+    ],
+)

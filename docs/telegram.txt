@@ -1,7 +1,11 @@
 set_state(
-1. category - ходим по кнопочкам структуры бота, выводим тексты, ссылки, карты
+1. States.category - ходим по кнопочкам структуры бота, выводим тексты, ссылки, карты
+2. RegistrationStates.full_name - вводим полное имя
+3. RegistrationStates.email - вводим email
+4. RegistrationStates.agreement - вводим согласие на перс. данные
 )
 
 callbacks:
-1. "category_None"  перейти в категорию с id (int | None)
+1. "category_None" - перейти в категорию с id (int | None)
 Если у категории есть link, то перейти в неё нельзя
+2. "yes", "no" - универсальные ответы

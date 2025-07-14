@@ -9,3 +9,6 @@ down:
 
 deldb:
 	docker volume rm docker_postgres_data
+
+freeze:
+	 pip freeze > .\bot\requirements.txt

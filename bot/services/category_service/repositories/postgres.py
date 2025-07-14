@@ -12,7 +12,7 @@ from .base import CategoryRepositoryBase
 class CategoryRepositoryPostgres(CategoryRepositoryBase):
     def __init__(self, session_maker):
         # 1: CategoryModel(id=1), -9999: None
-        self.session_maker = session_maker
+        self.session_maker = session_maker  # one time use
 
     async def reload_categories(self, *args, **kwargs):
         async with self.session_maker(expire_on_commit=False) as db_session:

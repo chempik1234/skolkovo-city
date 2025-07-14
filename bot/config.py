@@ -29,9 +29,10 @@ class BotConfig(Config):
 
 
 class States(StatesGroup):
-    registration = State()
-    """
-    if field_value == "" then "please enter field value" e.g. full_name
-    loop through fields and 
-    """
     category = State()
+
+
+class RegistrationStates(StatesGroup):
+    full_name = State()
+    email = State()
+    agreement = State()
