@@ -5,11 +5,15 @@ aiohttp==3.12.14
 aiosignal==1.4.0
 alembic==1.16.4
 annotated-types==0.7.0
+asgiref==3.9.1
 async-to-sync==0.2.3
 asyncpg==0.30.0
 attrs==25.3.0
 betterconf==3.1.0
 certifi==2025.7.9
+Django==5.2.4
+django-ckeditor==6.7.3
+django-js-asset==3.1.2
 dnspython==2.7.0
 dotenv==0.9.9
 email_validator==2.2.0
@@ -27,6 +31,8 @@ pydantic_core==2.33.2
 python-dotenv==1.1.1
 redis==6.2.0
 SQLAlchemy==2.0.41
+sqlparse==0.5.3
 typing-inspection==0.4.1
 typing_extensions==4.14.1
+tzdata==2025.2
 yarl==1.20.1
