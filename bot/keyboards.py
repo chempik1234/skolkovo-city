@@ -32,7 +32,7 @@ async def category_keyboard(category: CategoryModel | None) -> InlineKeyboardMar
                     callback_data=f'category_{parent_id}',
                 ),
                 InlineKeyboardButton(
-                    text='В главное меню',
+                    text='Главное меню',
                     callback_data='category_None',
                 ),
             ],
