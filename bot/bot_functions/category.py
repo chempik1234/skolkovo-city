@@ -1,12 +1,14 @@
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
 from config import States
 from init import bot, category_service
 from keyboards import category_keyboard
 from models.category import CategoryModel
+from utils import remove_newline_escapes
 
 
-async def send_category(category_message, chat_id: int | str | None, category: CategoryModel | None) -> None:
+async def send_category(category_message: Message | None, chat_id: int | str | None, category: CategoryModel | None) -> None:
     """
     send | update message with category inline buttons
     :param chat_id: send to chat id (not needed if category_message is not None)
@@ -20,6 +22,8 @@ async def send_category(category_message, chat_id: int | str | None, category: C
         text = "Главное меню"
 
     keyboard = await category_keyboard(category)
+
+    text = remove_newline_escapes(text)
 
     if category_message is None:
         if chat_id is None:
