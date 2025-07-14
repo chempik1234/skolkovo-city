@@ -1,6 +1,11 @@
+import os
+
 from aiogram.fsm.state import StatesGroup, State
 from betterconf import Config
 from betterconf.config import Field
+from dotenv import load_dotenv
+
+# load_dotenv("../config/.env", override=True)
 
 
 class BotConfig(Config):
@@ -8,9 +13,9 @@ class BotConfig(Config):
 
     #region redis conf
     REDIS_HOST: str = Field("REDIS_HOST")
-    REDIS_PORT: int = Field("REDIS_PORT")
+    REDIS_PORT: int = Field("REDIS_PORT", default="6379")
     REDIS_DB_FOR_DP: int = Field("REDIS_DB_FOR_DP")
-    REDIS_USER: str = Field("REDIS_USER")
+    REDIS_USER: str = Field("REDIS_USER", default="default")
     REDIS_PASSWORD: str = Field("REDIS_PASSWORD")
     #endregion
 

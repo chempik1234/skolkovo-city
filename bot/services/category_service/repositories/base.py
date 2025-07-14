@@ -2,14 +2,13 @@ from models.category import CategoryModel
 
 
 class CategoryRepositoryBase:
+    data: dict[int, CategoryModel | None] = {}
+
     async def get_object(self, _id: int | None) -> CategoryModel | None:
-        raise NotImplementedError()
+        return self.data[_id]
 
     async def get_children_by_id(self, parent_id: int | None) -> list[CategoryModel]:
-        raise NotImplementedError()
+        return [v for v in self.data.values() if isinstance(v, CategoryModel) and v.parent_id == parent_id]
 
-    async def reload_categories(self):
-        raise NotImplementedError()
-
-    async def has_children(self, parent_id: int | None) -> bool:
-        raise NotImplementedError()
+    def reload_categories(self, *args, **kwargs):
+        pass

@@ -65,21 +65,6 @@ def _str_dict_to_category_structure(data: dict) -> dict:
 
 
 class CategoryRepositoryInDict(CategoryRepositoryBase):
-    def __init__(self, data: dict):
+    def reload_categories(self, data, *args, **kwargs):
         # 1: CategoryModel(id=1), -9999: None
         self.data: dict[int, CategoryModel | None] = defaultdict(lambda: None, _str_dict_to_category_structure(data))
-
-    async def get_object(self, _id: int | None) -> CategoryModel | None:
-        return self.data[_id]
-
-    async def get_children_by_id(self, parent_id: int | None) -> list[CategoryModel]:
-        return [v for v in self.data.values() if isinstance(v, CategoryModel) and v.parent_id == parent_id]
-
-    async def has_children(self, parent_id: int | None) -> bool:
-        for v in self.data.values():
-            if v.parent_id == parent_id:
-                return True
-        return False
-
-    async def reload_categories(self):
-        pass
