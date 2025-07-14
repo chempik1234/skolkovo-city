@@ -14,10 +14,7 @@ class CategoryRepositoryPostgres(CategoryRepositoryBase):
         # 1: CategoryModel(id=1), -9999: None
         self.session_maker = session_maker
 
-    def reload_categories(self, *args, **kwargs):
-        asyncio.run(self._reload())
-
-    async def _reload(self):
+    async def reload_categories(self, *args, **kwargs):
         async with self.session_maker(expire_on_commit=False) as db_session:
             query_result = await db_session.execute(select(CategoryDataModel))
             objects_list = query_result.scalars().all()
