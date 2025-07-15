@@ -5,7 +5,8 @@ from django.db.models import TextField
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=256)
-    description = TextField(blank=True, null=True)
+    description_ru = TextField(blank=True, null=True)
+    description_en = TextField(blank=True, null=True)
     link = models.TextField(blank=True, null=True)
     parent = models.ForeignKey(
         'self',
@@ -30,6 +31,7 @@ class TelegramUser(models.Model):
     email = models.EmailField(blank=True, null=True)
     is_admin = models.BooleanField(default=False)
     personal_data_agreement = models.BooleanField(default=False)
+    language = models.CharField(default="ru", null=False, max_length=3)
 
     def __str__(self):
         return f"Telegram User {self.telegram_id}"

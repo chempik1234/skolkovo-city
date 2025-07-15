@@ -7,3 +7,4 @@ class UserModel(BaseModel):
     email: EmailStr | None
     is_admin: bool
     personal_data_agreement: bool
+    language: str

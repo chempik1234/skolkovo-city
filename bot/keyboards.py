@@ -55,3 +55,18 @@ yes_no_keyboard = InlineKeyboardMarkup(
         ],
     ],
 )
+
+language_keyboards = InlineKeyboardMarkup(
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text="🇷🇺",
+                callback_data="ru",
+            ),
+            InlineKeyboardButton(
+                text="🇬🇧",
+                callback_data="en",
+            ),
+        ],
+    ],
+)

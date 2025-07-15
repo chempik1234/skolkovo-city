@@ -23,6 +23,6 @@ class CategoryRepositoryPostgres(CategoryRepositoryBase):
 
         for category in objects_list:
             result[category.id] = CategoryModel(id=category.id, parent_id=category.parent_id,
-                                                title=category.title, description=category.description,
-                                                link=category.link)
+                                                title=category.title, description_ru=category.description_ru,
+                                                description_en=category.description_en, link=category.link)
         self.data = defaultdict(lambda: None, result)

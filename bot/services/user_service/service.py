@@ -16,7 +16,8 @@ class UserService:
             full_name=result.full_name,
             email=result.email,
             is_admin=result.is_admin,
-            personal_data_agreement=result.personal_data_agreement
+            personal_data_agreement=result.personal_data_agreement,
+            language=result.language,
         )
 
     async def _get_object(self, **kwargs) -> UserDataModel | None:

@@ -17,7 +17,11 @@ class CategoryDataModel(Base):
         sa.String(length=256),
         nullable=False
     )
-    description = sa.Column(
+    description_ru = sa.Column(
+        sa.Text,
+        nullable=True
+    )
+    description_en = sa.Column(
         sa.Text,
         nullable=True
     )
@@ -56,4 +60,10 @@ class UserDataModel(Base):
         sa.Boolean(),
         nullable=False,
         default=False
+    )
+
+    language: Mapped[str] = sa.Column(
+        sa.String(),
+        nullable=False,
+        default="ru",
     )

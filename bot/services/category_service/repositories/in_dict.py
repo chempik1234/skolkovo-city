@@ -40,7 +40,7 @@ def _str_dict_to_category_structure(data: dict) -> dict:
                 result.update(_handle(value, category.id))
 
             elif isinstance(value, str):
-                category.description = value
+                category.description_ru = value
 
             elif isinstance(value, tuple):  # description | children
                 length = len(value)
@@ -48,7 +48,7 @@ def _str_dict_to_category_structure(data: dict) -> dict:
                     if not isinstance(value[0], str) and value[0] is not None:
                         raise TypeError(f"Category {category.title} has description of type {type(value[0])}, "
                                         f"str|None required")
-                    category.description = value[0]
+                    category.description_ru = value[0]
                 if length >= 2:
                     if not isinstance(value[1], str) and value[1] is not None:
                         raise TypeError(f"Category {category.title} has link of type {type(value[1])}, "

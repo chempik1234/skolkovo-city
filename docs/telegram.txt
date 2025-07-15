@@ -1,8 +1,10 @@
 set_state(
-1. States.category - ходим по кнопочкам структуры бота, выводим тексты, ссылки, карты
-2. RegistrationStates.full_name - вводим полное имя
-3. RegistrationStates.email - вводим email
-4. RegistrationStates.agreement - вводим согласие на перс. данные
+  States.default - состояние, в котором не срабатывают callback (для перехода в главное меню)
+  States.category - ходим по кнопочкам структуры бота, выводим тексты, ссылки, карты
+  States.choose_language - выбираем язык
+  RegistrationStates.full_name - вводим полное имя
+  RegistrationStates.email - вводим email
+  RegistrationStates.agreement - вводим согласие на перс. данные
 )
 
 callbacks:

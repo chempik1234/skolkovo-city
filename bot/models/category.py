@@ -5,5 +5,7 @@ class CategoryModel(BaseModel):
     title: str
     id: int
     parent_id: int | None
-    description: str | None
     link: str | None
+
+    description_ru: str | None
+    description_en: str | None

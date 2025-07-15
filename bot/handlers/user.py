@@ -5,7 +5,7 @@ from aiogram.types import Message, CallbackQuery
 from email_validator import validate_email
 
 from bot_functions.user import check_user_data
-from config import RegistrationStates
+from config import RegistrationStates, States
 from init import users_service
 
 router = Router()
@@ -54,3 +54,12 @@ async def agreement_input_handler(callback: CallbackQuery, state: FSMContext):
 
     await users_service.update_data(user_id, {"personal_data_agreement": True}, create_if_absent=True)
     await check_user_data(user_id, state, send_success_message=True)
+
+
+@router.callback_query(States.choose_language)
+async def choose_language_handler(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    language = callback.data
+    await users_service.update_data(user_id, {"language": language})
+    await state.set_state(States.default)
+    await callback.answer("Язык изменён")

@@ -7,7 +7,7 @@ from .models import Category, TelegramUser
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'parent')
     list_filter = ('parent',)
-    search_fields = ('title', 'description')
+    search_fields = ('title',)
     prepopulated_fields = {}
 
 
