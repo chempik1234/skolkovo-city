@@ -31,7 +31,6 @@ ALLOWED_HOSTS = os.getenv("DJANGO_HOSTS", "*").split()
 # Application definition
 
 INSTALLED_APPS = [
-    'ckeditor',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,21 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "main_app",
 ]
-
-# CKEDITOR
-CKEDITOR_UPLOAD_PATH = "uploads/"
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': [
-            {
-                'items': [
-                    'Bold', 'Italic', 'Underline', 'Styles', 'Font', 'FontSize', 'NumberedList', 'BulletedList',
-                    'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'
-                ],
-            },
-        ],
-    },
-}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -28,9 +28,9 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
     if category_message is None:
         if chat_id is None:
             raise ValueError("either category_message or chat_id is required")
-        await bot.send_message(chat_id=chat_id, text=text, reply_markup=keyboard)
+        await bot.send_message(chat_id=chat_id, text=text, reply_markup=keyboard, parse_mode="Markdown")
     else:
-        await category_message.edit_text(text=text)
+        await category_message.edit_text(text=text, parse_mode="Markdown")
         await category_message.edit_reply_markup(reply_markup=keyboard)
 
 
