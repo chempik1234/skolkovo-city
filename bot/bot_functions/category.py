@@ -5,7 +5,10 @@ from config import States
 from init import bot, category_service
 from keyboards import category_keyboard
 from models.category import CategoryModel
-from utils import remove_newline_escapes, get_language_for_telegram_id as _l, get_title_description_for_language as _tdl
+from translation import (translate_string as _,
+                         get_language_for_telegram_id as _l,
+                         get_title_description_for_language as _tdl)
+from utils import remove_newline_escapes
 
 
 async def send_category(category_message: Message | None, chat_id: int | str | None, category: CategoryModel | None) -> None:
@@ -31,7 +34,7 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         else:
             text = "???"
     else:
-        text = "Главное меню"
+        text = _("Главное меню", language)
 
     keyboard = await category_keyboard(category, language=language)
 

@@ -39,6 +39,6 @@ async def get_language_for_telegram_id(telegram_id: int | str):
     return language
 
 
-async def translate_string(string: str, language: str):
+def translate_string(string: str, language: str):
     # TODO: make i18n from scratch
     return string
