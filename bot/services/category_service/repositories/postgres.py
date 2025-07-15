@@ -16,7 +16,7 @@ class CategoryRepositoryPostgres(CategoryRepositoryBase):
 
     async def reload_categories(self, *args, **kwargs):
         async with self.session_maker(expire_on_commit=False) as db_session:
-            query_result = await db_session.execute(select(CategoryDataModel))
+            query_result = await db_session.execute(select(CategoryDataModel).order_by(CategoryDataModel.id))
             objects_list = query_result.scalars().all()
 
         result = {}
