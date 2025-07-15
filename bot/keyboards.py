@@ -19,7 +19,7 @@ async def category_keyboard(category: CategoryModel | None, language: str = "ru"
         keyboard.append(
             [
                 InlineKeyboardButton(
-                    text=text,
+                    text=text if text else "???",
                     callback_data=f'category_{category.id}' if not category.link else None,
                     url=category.link,
                 )
