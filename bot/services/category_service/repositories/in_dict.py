@@ -6,6 +6,8 @@ from .base import CategoryRepositoryBase
 
 def _str_dict_to_category_structure(data: dict) -> dict:
     """
+    DOESNT WORK WITH i18n
+
     Pass a dict structured like this:
 
     1. Key is title
@@ -14,7 +16,7 @@ def _str_dict_to_category_structure(data: dict) -> dict:
     Get a dict with objects and ids as keys (for indexing)
 
     :param data: {"A": {"B": ("good", "https://ya.ru")}}
-    :return: {0: Category(title=A, id=0), 1: Category(title=B, id=1, parent_id=0, description="good", link="https://ya.ru")}
+    :return: {0: Category(title_ru=A, id=0), 1: Category(title_ru=B, id=1, parent_id=0, description="good", link="https://ya.ru")}
     """
     last_id = 0
 
@@ -26,7 +28,7 @@ def _str_dict_to_category_structure(data: dict) -> dict:
         result = {}
         for key, value in data.items():
             category = CategoryModel(
-                title=key,
+                title_ru=key,
                 id=last_id,
                 parent_id=parent_id,
                 description=None,
@@ -46,17 +48,17 @@ def _str_dict_to_category_structure(data: dict) -> dict:
                 length = len(value)
                 if length >= 1:
                     if not isinstance(value[0], str) and value[0] is not None:
-                        raise TypeError(f"Category {category.title} has description of type {type(value[0])}, "
+                        raise TypeError(f"Category {category.id} has description of type {type(value[0])}, "
                                         f"str|None required")
                     category.description_ru = value[0]
                 if length >= 2:
                     if not isinstance(value[1], str) and value[1] is not None:
-                        raise TypeError(f"Category {category.title} has link of type {type(value[1])}, "
+                        raise TypeError(f"Category {category.id} has link of type {type(value[1])}, "
                                         f"str|None required")
                     category.link = value[1]
                 if length >= 3:
                     if not isinstance(value[2], dict) and value[2] is not None:
-                        raise TypeError(f"Category {category.title} has children info of type {type(value[2])}, "
+                        raise TypeError(f"Category {category.id} has children info of type {type(value[2])}, "
                                         f"dict|None required")
                     result.update(_handle(value[2], category.id))
         return result

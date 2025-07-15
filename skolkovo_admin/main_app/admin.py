@@ -5,9 +5,9 @@ from .models import Category, TelegramUser
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'parent')
+    list_display = ('title_ru', 'title_en', 'parent')
     list_filter = ('parent',)
-    search_fields = ('title',)
+    search_fields = ('title_ru', 'title_en',)
     prepopulated_fields = {}
 
 

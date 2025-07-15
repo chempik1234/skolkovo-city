@@ -13,9 +13,13 @@ class CategoryDataModel(Base):
         primary_key=True,
         autoincrement=True
     )
-    title: Mapped[str] = sa.Column(
+    title_ru: Mapped[str] = sa.Column(
         sa.String(length=256),
         nullable=False
+    )
+    title_en: Mapped[str] = sa.Column(
+        sa.String(length=256),
+        nullable=True
     )
     description_ru = sa.Column(
         sa.Text,

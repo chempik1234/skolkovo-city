@@ -5,7 +5,7 @@ from betterconf import Config
 from betterconf.config import Field
 from dotenv import load_dotenv
 
-# load_dotenv("../config/.env", override=True)
+load_dotenv("../config/.env", override=True)
 
 
 class BotConfig(Config):

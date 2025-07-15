@@ -2,9 +2,10 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from init import category_service
 from models.category import CategoryModel
+from utils import get_title_for_language as _t
 
 
-async def category_keyboard(category: CategoryModel | None) -> InlineKeyboardMarkup:
+async def category_keyboard(category: CategoryModel | None, language: str = "ru") -> InlineKeyboardMarkup:
     if isinstance(category, CategoryModel):
         category_id, parent_id = category.id, category.parent_id
     else:
@@ -14,7 +15,7 @@ async def category_keyboard(category: CategoryModel | None) -> InlineKeyboardMar
 
     keyboard = []
     for category in category_children:
-        text = category.title
+        text = await _t(category, language)
         keyboard.append(
             [
                 InlineKeyboardButton(

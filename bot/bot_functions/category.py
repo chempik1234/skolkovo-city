@@ -5,7 +5,7 @@ from config import States
 from init import bot, category_service
 from keyboards import category_keyboard
 from models.category import CategoryModel
-from utils import remove_newline_escapes, get_description_for_chat_id
+from utils import remove_newline_escapes, get_title_description_for_chat_id as _td
 
 
 async def send_category(category_message: Message | None, chat_id: int | str | None, category: CategoryModel | None) -> None:
@@ -19,8 +19,9 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
     if isinstance(category, CategoryModel):
         # bad for us chat id might be group id, not user id
         telegram_id = chat_id if chat_id is not None else category_message.chat.id
-        description = await get_description_for_chat_id(category, telegram_id)
-        text = description if description else category.title
+
+        title, description = await _td(category, telegram_id)
+        text = description if description else title
     else:
         text = "Главное меню"
 

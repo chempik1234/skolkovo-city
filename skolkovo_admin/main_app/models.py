@@ -4,7 +4,8 @@ from django.db.models import TextField
 
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=256)
+    title_ru = models.CharField(max_length=256)
+    title_en = models.CharField(max_length=256, null=True)
     description_ru = TextField(blank=True, null=True)
     description_en = TextField(blank=True, null=True)
     link = models.TextField(blank=True, null=True)
@@ -17,7 +18,7 @@ class Category(models.Model):
     )
 
     def __str__(self):
-        return self.title
+        return f"{self.title_ru} (en={self.title_en})"
 
     class Meta:
         db_table = 'category'

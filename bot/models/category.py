@@ -2,7 +2,8 @@ from pydantic import BaseModel
 
 
 class CategoryModel(BaseModel):
-    title: str
+    title_ru: str
+    title_en: str
     id: int
     parent_id: int | None
     link: str | None
