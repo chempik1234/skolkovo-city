@@ -12,3 +12,4 @@ deldb:
 
 freeze:
 	 pip freeze > .\bot\requirements.txt
+	 pip freeze > .\skolkovo_admin\requirements.txt
