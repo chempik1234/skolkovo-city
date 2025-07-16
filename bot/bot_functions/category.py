@@ -42,6 +42,8 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
     if category_message is None and chat_id is None:
         raise ValueError("either category_message or chat_id is required")
 
+    send_to = chat_id if chat_id else telegram_id
+
     send_images = isinstance(category, CategoryModel) and category.images_urls
     if send_images:
         photo_urls = category.images_urls
@@ -51,11 +53,11 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         ]
         media_group[0].caption = text
         media_group[0].parse_mode = "Markdown"
-        await bot.send_media_group(chat_id=chat_id if chat_id else telegram_id, media=media_group)
+        await bot.send_media_group(chat_id=send_to, media=media_group)
 
 
     if send_images or category_message is None:
-        await bot.send_message(chat_id=chat_id, text=text, reply_markup=keyboard, parse_mode="Markdown")
+        await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode="Markdown")
     else:
         await category_message.edit_text(text=text, parse_mode="Markdown")
         await category_message.edit_reply_markup(reply_markup=keyboard)
