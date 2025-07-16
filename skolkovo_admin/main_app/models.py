@@ -6,7 +6,7 @@ from django.db.models import TextField
 class Category(models.Model):
     id = models.AutoField(primary_key=True)
     title_ru = models.CharField(max_length=256)
-    title_en = models.CharField(max_length=256, null=True)
+    title_en = models.CharField(max_length=256, null=True, blank=True)
     description_ru = TextField(blank=True, null=True)
     description_en = TextField(blank=True, null=True)
     link = models.TextField(blank=True, null=True)
