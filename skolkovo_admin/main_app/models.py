@@ -45,6 +45,8 @@ class TelegramUser(models.Model):
     # personal_data_agreement = models.BooleanField(default=False)
     language = models.CharField(default="ru", null=False, max_length=3)
 
+    is_banned = models.BooleanField(default=False)
+
     def __str__(self):
         return f"Telegram User {self.telegram_id}"
 

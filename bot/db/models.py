@@ -65,6 +65,11 @@ class UserDataModel(Base):
         nullable=False,
         default=False
     )
+    is_banned: Mapped[bool] = sa.Column(
+        sa.Boolean(),
+        nullable=False,
+        default=False,
+    )
     # personal_data_agreement: Mapped[bool] = sa.Column(
     #     sa.Boolean(),
     #     nullable=False,

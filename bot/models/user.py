@@ -7,4 +7,5 @@ class UserModel(BaseModel):
     # email: EmailStr | None
     # personal_data_agreement: bool
     is_admin: bool
+    is_banned: bool
     language: str

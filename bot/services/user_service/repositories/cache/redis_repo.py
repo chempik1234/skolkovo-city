@@ -25,7 +25,8 @@ class UserCacheRepositoryRedis(UserCacheRepositoryBase):
             # "email": model.email,
             # "personal_data_agreement": model.personal_data_agreement,
             "is_admin": model.is_admin,
-            "language": model.language
+            "language": model.language,
+            "is_banned": model.is_banned,
         }
         return json.dumps(d)
 

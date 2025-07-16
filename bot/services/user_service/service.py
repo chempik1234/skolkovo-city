@@ -17,6 +17,7 @@ class UserService:
             is_admin=result.is_admin,
             # personal_data_agreement=result.personal_data_agreement,
             language=result.language,
+            is_banned=result.is_banned,
         )
 
     async def _get_object(self, no_cache_check: bool = False, **kwargs) -> UserDataModel | None:
