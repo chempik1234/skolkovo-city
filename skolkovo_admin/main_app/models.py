@@ -15,7 +15,8 @@ class Category(models.Model):
         on_delete=models.CASCADE,
         db_column='parent_id',
         blank=True,
-        null=True
+        null=True,
+        related_name='children',
     )
 
     images_urls = ArrayField(
