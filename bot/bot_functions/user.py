@@ -22,6 +22,8 @@ async def check_user_data(telegram_id: int) -> bool:  # , state: FSMContext, sen
     :param telegram_id: telegram id to check
     :return: ``True`` if user can use bot, else ``False``
     """
+    if await users_service.is_banned(telegram_id):
+        return False
     await users_service.create_object(object_data={"telegram_id": telegram_id}, skip_if_exists=True)
     return True
     #

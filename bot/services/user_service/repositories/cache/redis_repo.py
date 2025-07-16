@@ -1,6 +1,8 @@
 import json
+from typing import Any
 
 from redis import Redis
+from sqlalchemy.orm import Mapped
 
 from db.models import UserDataModel
 from services.user_service.repositories.cache.base import UserCacheRepositoryBase
@@ -43,3 +45,19 @@ class UserCacheRepositoryRedis(UserCacheRepositoryBase):
 
     def cache_object(self, user: UserDataModel) -> None:
         self.redis.set(str(user.telegram_id), self._serialize(user), ex=self.expire_seconds)
+
+    def cache_object_field(self, user: UserDataModel, field_name: str = "telegram_id") -> None:
+        if not hasattr(user, field_name):
+            raise AttributeError("field doesn't exists")
+        value = getattr(user, field_name)
+        if type(value) is bool:
+            value = 1 if value else 0
+        self.redis.set(f"{user.telegram_id}__{field_name}", value, ex=self.expire_seconds)
+
+    def get_object_field(self, telegram_id, field_name: str) -> Any:
+        result = self.redis.get(f"{telegram_id}__{field_name}")
+        if result is None:
+            return None
+        if UserDataModel.__annotations__.get(field_name, None) is Mapped[bool]:
+            result = True if int(result) == 1 else False
+        return result

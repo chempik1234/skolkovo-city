@@ -1,3 +1,5 @@
+from sqlalchemy.util import await_only
+
 from db.models import UserDataModel
 from models.user import UserModel
 from .repositories.cache.base import UserCacheRepositoryBase
@@ -67,3 +69,20 @@ class UserService:
 
         result: UserDataModel = await self.user_storage_repo.create_object(object_data)
         return self._to_model(result)
+
+    async def is_banned(self, telegram_id: int, no_cache_check=False) -> bool | None:
+        result = None
+        if not no_cache_check:
+            result = self.user_cache_repo.get_object_field(telegram_id, "is_banned")
+            print("from cache", result)
+
+        if result is None:
+            user = await self._get_object(telegram_id=telegram_id, no_cache_check=no_cache_check)
+            if user is None:
+                return None
+
+            self.user_cache_repo.cache_object_field(user, "is_banned")
+
+            result = user.is_banned
+            print("from DB", result)
+        return result
