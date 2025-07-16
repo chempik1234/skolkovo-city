@@ -15,5 +15,5 @@ class CheckRegistrationMiddleware(BaseMiddleware):
         if user_id:
             passed = await check_user_data(user_id)
         if passed:
-            result = handler(event, data)  # send to register if no data
+            result = await handler(event, data)
             return result
