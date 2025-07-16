@@ -18,10 +18,8 @@ router = Router()
 
 @router.message(Command(commands=["start"]))
 async def command_start(message: Message, state: FSMContext):
-    user_id = message.from_user.id
-    if await check_user_data(user_id):  # , state):
-        await handle_category(current_category_id=None, chat_id=message.chat.id,
-                              category_message=None, state=state)
+    await handle_category(current_category_id=None, chat_id=message.chat.id,
+                          category_message=None, state=state)
 
 
 @router.message(Command(commands=["language"]))

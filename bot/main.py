@@ -3,8 +3,11 @@ import asyncio
 from init import bot, dp
 from handlers import routers_list
 from commands import router as commands_router
+from middlewares.check_registration_middleware import CheckRegistrationMiddleware
 
 dp.include_routers(commands_router, *routers_list)
+dp.message.outer_middleware(CheckRegistrationMiddleware())
+dp.callback_query.outer_middleware(CheckRegistrationMiddleware())
 
 
 async def start():
