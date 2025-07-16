@@ -1,16 +1,11 @@
-import asyncio
-import uuid
-
-from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
 from db.models import UserDataModel
-from models.user import UserModel
-from .base import UserRepositoryBase
+from services.user_service.repositories.storage.base import UserStorageRepositoryBase
 
 
-class UserRepositoryPostgres(UserRepositoryBase):
+class UserStorageRepositoryPostgres(UserStorageRepositoryBase):
     def __init__(self, sqlalchemy_session_maker):
         self.session_maker = sqlalchemy_session_maker
 

@@ -1,7 +1,7 @@
 from db.models import UserDataModel
 
 
-class UserRepositoryBase:
+class UserStorageRepositoryBase:
     async def get_object(self, **kwargs) -> UserDataModel | None:
         raise NotImplementedError()
 

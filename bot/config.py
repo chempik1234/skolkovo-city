@@ -14,9 +14,11 @@ class BotConfig(Config):
     #region redis conf
     REDIS_HOST: str = Field("REDIS_HOST")
     REDIS_PORT: int = Field("REDIS_PORT", default="6379")
-    REDIS_DB_FOR_DP: int = Field("REDIS_DB_FOR_DP")
+    REDIS_DB_FOR_DP: int = Field("REDIS_DB_FOR_DP", default="0")
+    REDIS_DB_FOR_USERS: int = Field("REDIS_DB_FOR_USERS", default="1")
     REDIS_USER: str = Field("REDIS_USER", default="default")
     REDIS_PASSWORD: str = Field("REDIS_PASSWORD")
+    REDIS_USERS_EXPIRE_SECONDS: int = Field("REDIS_USERS_EXPIRE_SECONDS", default=600)
     #endregion
 
     #region postgres conf
