@@ -51,7 +51,6 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
             InputMediaPhoto(media=url)
             for url in photo_urls[:10]
         ]
-        media_group[0].caption = text
         media_group[0].parse_mode = "Markdown"
         await bot.send_media_group(chat_id=send_to, media=media_group)
 
