@@ -1,5 +1,5 @@
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, InputMediaPhoto
 
 from config import States
 from init import bot, category_service
@@ -24,7 +24,6 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
 
     if isinstance(category, CategoryModel):
         # bad for us chat id might be group id, not user id
-        telegram_id = chat_id if chat_id is not None else category_message.chat.id
 
         title, description = await _tdl(category, language)
         if description:
@@ -40,9 +39,22 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
 
     text = remove_newline_escapes(text)
 
-    if category_message is None:
-        if chat_id is None:
-            raise ValueError("either category_message or chat_id is required")
+    if category_message is None and chat_id is None:
+        raise ValueError("either category_message or chat_id is required")
+
+    send_images = isinstance(category, CategoryModel) and category.images_urls
+    if send_images:
+        photo_urls = category.images_urls
+        media_group = [
+            InputMediaPhoto(media=url)
+            for url in photo_urls[:10]
+        ]
+        media_group[0].caption = text
+        media_group[0].parse_mode = "Markdown"
+        await bot.send_media_group(chat_id=chat_id if chat_id else telegram_id, media=media_group)
+
+
+    if send_images or category_message is None:
         await bot.send_message(chat_id=chat_id, text=text, reply_markup=keyboard, parse_mode="Markdown")
     else:
         await category_message.edit_text(text=text, parse_mode="Markdown")

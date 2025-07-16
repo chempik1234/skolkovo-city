@@ -34,6 +34,11 @@ class CategoryDataModel(Base):
         nullable=True
     )
 
+    images_urls = sa.Column(
+        sa.ARRAY(sa.Text),
+        nullable=True
+    )
+
     parent_id = sa.Column(
         sa.ForeignKey("category.id", ondelete="CASCADE"),
         nullable=True,

@@ -67,6 +67,7 @@ def _str_dict_to_category_structure(data: dict) -> dict:
 
 
 class CategoryRepositoryInDict(CategoryRepositoryBase):
+    # TODO: remove this bullshit
     def reload_categories(self, data, *args, **kwargs):
         # 1: CategoryModel(id=1), -9999: None
         self.data: dict[int, CategoryModel | None] = defaultdict(lambda: None, _str_dict_to_category_structure(data))

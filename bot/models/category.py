@@ -8,5 +8,7 @@ class CategoryModel(BaseModel):
     parent_id: int | None
     link: str | None
 
+    images_urls: list[str] | None
+
     description_ru: str | None
     description_en: str | None

@@ -17,7 +17,7 @@ class CategoryRepositoryPostgres(CategoryRepositoryBase):
     async def reload_categories(self, *args, **kwargs):
         async with self.session_maker(expire_on_commit=False) as db_session:
             query_result = await db_session.execute(select(CategoryDataModel).order_by(CategoryDataModel.id))
-            objects_list = query_result.scalars().all()
+            objects_list: Iterable[CategoryDataModel] = query_result.scalars().all()
 
         result = {}
 
@@ -25,5 +25,6 @@ class CategoryRepositoryPostgres(CategoryRepositoryBase):
             result[category.id] = CategoryModel(id=category.id, parent_id=category.parent_id,
                                                 title_ru=category.title_ru, title_en=category.title_en,
                                                 description_ru=category.description_ru,
-                                                description_en=category.description_en, link=category.link)
+                                                description_en=category.description_en, link=category.link,
+                                                images_urls=category.images_urls)
         self.data = defaultdict(lambda: None, result)
