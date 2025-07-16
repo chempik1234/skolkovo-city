@@ -7,5 +7,5 @@ class ImageArrayWidget(forms.Textarea):
     def render(self, name, value, attrs=None, renderer=None):
         if not value:
             value = ""
-        value = value.replace(',', ',\n\n')
+        value = value.replace("\n\n", "").replace(',', ',\n\n')
         return mark_safe(f'<textarea style="width: 700px; height: 200px" name="{escape(name)}">{escape(value)}</textarea>')
