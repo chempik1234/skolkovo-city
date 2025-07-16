@@ -36,7 +36,7 @@ class States(StatesGroup):
     choose_language = State()
 
 
-class RegistrationStates(StatesGroup):
-    full_name = State()
-    email = State()
-    agreement = State()
+# class RegistrationStates(StatesGroup):
+#     full_name = State()
+#     email = State()
+#     agreement = State()

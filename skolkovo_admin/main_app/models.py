@@ -28,10 +28,10 @@ class Category(models.Model):
 
 class TelegramUser(models.Model):
     telegram_id = models.BigIntegerField(primary_key=True)
-    full_name = models.CharField(max_length=256, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+    # full_name = models.CharField(max_length=256, blank=True, null=True)
+    # email = models.EmailField(blank=True, null=True)
     is_admin = models.BooleanField(default=False)
-    personal_data_agreement = models.BooleanField(default=False)
+    # personal_data_agreement = models.BooleanField(default=False)
     language = models.CharField(default="ru", null=False, max_length=3)
 
     def __str__(self):

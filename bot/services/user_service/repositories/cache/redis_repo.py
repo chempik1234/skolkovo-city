@@ -21,9 +21,9 @@ class UserCacheRepositoryRedis(UserCacheRepositoryBase):
     def _serialize(self, model: UserDataModel) -> str:
         d = {
             "telegram_id": model.telegram_id,
-            "full_name": model.full_name,
-            "email": model.email,
-            "personal_data_agreement": model.personal_data_agreement,
+            # "full_name": model.full_name,
+            # "email": model.email,
+            # "personal_data_agreement": model.personal_data_agreement,
             "is_admin": model.is_admin,
             "language": model.language
         }

@@ -12,10 +12,10 @@ class UserService:
     def _to_model(self, result: UserDataModel) -> UserModel:
         return UserModel(
             telegram_id=result.telegram_id,
-            full_name=result.full_name,
-            email=result.email,
+            # full_name=result.full_name,
+            # email=result.email,
             is_admin=result.is_admin,
-            personal_data_agreement=result.personal_data_agreement,
+            # personal_data_agreement=result.personal_data_agreement,
             language=result.language,
         )
 
@@ -57,10 +57,12 @@ class UserService:
         await self.user_storage_repo.update_data(existing_object, data)
         self.user_cache_repo.invalidate_object(telegram_id)  # invalidate cache after all
 
-    async def create_object(self, object_data: dict) -> UserModel:
+    async def create_object(self, object_data: dict, skip_if_exists: bool = False) -> UserModel:
         telegram_id = object_data.get("telegram_id")
         existing_object = await self.get_object(telegram_id=telegram_id, no_cache=True)
         if existing_object:
+            if skip_if_exists:
+                return existing_object
             raise ValueError(f"user with telegram id {telegram_id} already exists")
 
         result: UserDataModel = await self.user_storage_repo.create_object(object_data)

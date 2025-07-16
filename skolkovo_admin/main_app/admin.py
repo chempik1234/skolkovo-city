@@ -13,6 +13,6 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
-    list_display = ('telegram_id', 'full_name', 'email', 'is_admin')
+    list_display = ('telegram_id', 'is_admin')
     list_filter = ('is_admin',)
-    search_fields = ('telegram_id', 'full_name', 'email')
+    search_fields = ('telegram_id',)

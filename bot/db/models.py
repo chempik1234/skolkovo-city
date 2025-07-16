@@ -47,24 +47,24 @@ class UserDataModel(Base):
         sa.BigInteger(),
         primary_key=True,
     )
-    full_name: Mapped[str] = sa.Column(
-        sa.String(length=256),
-        nullable=True
-    )
-    email: Mapped[str] = sa.Column(
-        sa.String(length=256),
-        nullable=True
-    )
+    # full_name: Mapped[str] = sa.Column(
+    #     sa.String(length=256),
+    #     nullable=True
+    # )
+    # email: Mapped[str] = sa.Column(
+    #     sa.String(length=256),
+    #     nullable=True
+    # )
     is_admin: Mapped[bool] = sa.Column(
         sa.Boolean(),
         nullable=False,
         default=False
     )
-    personal_data_agreement: Mapped[bool] = sa.Column(
-        sa.Boolean(),
-        nullable=False,
-        default=False
-    )
+    # personal_data_agreement: Mapped[bool] = sa.Column(
+    #     sa.Boolean(),
+    #     nullable=False,
+    #     default=False
+    # )
 
     language: Mapped[str] = sa.Column(
         sa.String(),
