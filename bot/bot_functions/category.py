@@ -33,7 +33,7 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         else:
             text = "???"
     else:
-        text = _("Главное меню", language)
+        text = _("Привет! Здесь вы можете найти все об ИЦ Сколково.\nВыберите то, что вас сейчас интересует", language)
 
     keyboard = await category_keyboard(category, language=language)
 
