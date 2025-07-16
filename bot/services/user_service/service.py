@@ -19,9 +19,9 @@ class UserService:
             language=result.language,
         )
 
-    async def _get_object(self, no_cache: bool = False, **kwargs) -> UserDataModel | None:
+    async def _get_object(self, no_cache_check: bool = False, **kwargs) -> UserDataModel | None:
         result = None
-        if not no_cache:
+        if not no_cache_check:
             # 1. check cache
             if len(kwargs) == 1 and "telegram_id" in kwargs:  # we can only use cache if there's only telegram id filter
                 result: UserDataModel | None = self.user_cache_repo.get_object(kwargs["telegram_id"])
@@ -30,21 +30,20 @@ class UserService:
         if result is None:
             result: UserDataModel | None = await self.user_storage_repo.get_object(**kwargs)
 
-            if not no_cache:
-                # 3. save in cache
-                if result is not None:
-                   self.user_cache_repo.cache_object(result)
+            # 3. save in cache
+            if result is not None:
+               self.user_cache_repo.cache_object(result)
 
         return result
 
-    async def get_object(self, no_cache: bool = False, **kwargs) -> UserModel | None:
-        result: UserDataModel | None = await self._get_object(**kwargs)
+    async def get_object(self, no_cache_check: bool = False, **kwargs) -> UserModel | None:
+        result: UserDataModel | None = await self._get_object(no_cache_check=no_cache_check, **kwargs)
         if not result:
             return None
         return self._to_model(result)
 
     async def update_data(self, telegram_id: int, data: dict, create_if_absent: bool = False) -> None:
-        existing_object = await self._get_object(telegram_id=telegram_id, no_cache=True)
+        existing_object = await self._get_object(telegram_id=telegram_id, no_cache_check=True)
 
         if not existing_object:
             if not create_if_absent:
@@ -59,7 +58,7 @@ class UserService:
 
     async def create_object(self, object_data: dict, skip_if_exists: bool = False) -> UserModel:
         telegram_id = object_data.get("telegram_id")
-        existing_object = await self.get_object(telegram_id=telegram_id, no_cache=True)
+        existing_object = await self.get_object(telegram_id=telegram_id, no_cache_check=False)
         if existing_object:
             if skip_if_exists:
                 return existing_object
