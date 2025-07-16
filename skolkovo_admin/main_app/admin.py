@@ -24,7 +24,7 @@ class CategoryInline(admin.TabularInline):  # admin.StackedInline
     model = Category
     fk_name = 'parent'
     extra = 1
-    fields = ('title_ru', 'title_en', 'link', 'images_urls')
+    fields = ('title_ru', 'title_en', 'description_ru', 'description_en', 'link', 'images_urls')
     show_change_link = True
 
 
