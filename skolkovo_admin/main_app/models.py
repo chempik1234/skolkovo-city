@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import TextField
 
@@ -15,6 +16,15 @@ class Category(models.Model):
         db_column='parent_id',
         blank=True,
         null=True
+    )
+
+    images_urls = ArrayField(
+        models.TextField(blank=True),
+        blank=True,
+        null=True,
+        default=list,
+        help_text="Список URL изображений",
+        verbose_name="Ссылки на изображения (ЧЕРЕЗ ЗАПЯТУЮ)"
     )
 
     def __str__(self):
