@@ -71,8 +71,19 @@ class CategoryAdmin(admin.ModelAdmin):
     images_urls_display.short_description = "Изображения"
 
 
+@admin.action(description="Забанить в тг")
+def ban_users(modeladmin, request, queryset):
+    queryset.update(is_banned=True)
+
+
+@admin.action(description="Разбанить в тг")
+def ban_users_reverse(modeladmin, request, queryset):
+    queryset.update(is_banned=False)
+
+
 @admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
-    list_display = ('telegram_id', 'is_admin')
-    list_filter = ('is_admin',)
+    list_display = ('telegram_id', 'is_admin', 'is_banned')
+    list_filter = ('is_admin', 'is_banned')
     search_fields = ('telegram_id',)
+    actions = (ban_users, ban_users_reverse,)
