@@ -24,13 +24,13 @@ class CategoryInline(admin.TabularInline):  # admin.StackedInline
     model = Category
     fk_name = 'parent'
     extra = 1
-    fields = ('title_ru', 'title_en', 'description_ru', 'description_en', 'link', 'images_urls')
+    fields = ('order_num', 'title_ru', 'title_en', 'description_ru', 'description_en', 'link', 'images_urls')
     show_change_link = True
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('title_ru', 'title_en', 'parent')
+    list_display = ('order_num', 'title_ru', 'title_en', 'parent')
     list_filter = ('parent',)
     search_fields = ('title_ru', 'title_en',)
     prepopulated_fields = {}

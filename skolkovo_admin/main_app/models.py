@@ -19,6 +19,11 @@ class Category(models.Model):
         related_name='children',
     )
 
+    order_num = models.IntegerField(
+        blank=True, null=False, unique=False,
+        verbose_name="Порядковый номер"
+    )
+
     images_urls = ArrayField(
         models.TextField(blank=True),
         blank=True,
@@ -27,6 +32,14 @@ class Category(models.Model):
         help_text="Список URL изображений",
         verbose_name="Ссылки на изображения (ЧЕРЕЗ ЗАПЯТУЮ)"
     )
+
+    def save(self, *args, **kwargs):
+        # order num is current max in group + 1 by default
+        if self.order_num is None:
+            max_order = Category.objects.filter(parent_id=self.parent_id).aggregate(models.Max('order_num'))[
+                'order_num__max']
+            self.order_num = (max_order or 0) + 1
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.title_ru} (en={self.title_en})"

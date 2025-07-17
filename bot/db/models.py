@@ -33,6 +33,11 @@ class CategoryDataModel(Base):
         sa.Text,
         nullable=True
     )
+    order_num = sa.Column(
+        sa.Integer,
+        nullable=False,
+        unique=False
+    )
 
     images_urls = sa.Column(
         sa.ARRAY(sa.Text),
