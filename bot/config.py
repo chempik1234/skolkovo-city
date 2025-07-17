@@ -35,7 +35,6 @@ class BotConfig(Config):
 class States(StatesGroup):
     default = State()
     category = State()
-    choose_language = State()
 
 
 # class RegistrationStates(StatesGroup):

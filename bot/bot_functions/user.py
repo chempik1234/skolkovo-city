@@ -3,6 +3,7 @@
 # from config import RegistrationStates
 # from keyboards import yes_no_keyboard
 # from models.user import UserModel
+from typing import Tuple
 
 from init import users_service
 
@@ -14,18 +15,22 @@ def user_data_filled_text(full_name_filled: bool, email_filled: bool, personal_d
             f"Согласие на обработку персональных данных: {'✅' if personal_data_agreement_filled else '❌'}")
 
 
-async def check_user_data(telegram_id: int) -> bool:  # , state: FSMContext, send_success_message: bool = False) -> bool:
+async def check_user_data(telegram_id: int) -> Tuple[bool, bool]:  # , state: FSMContext, send_success_message: bool = False) -> bool:
     """
     registrates user if not already and returns ``True``
     # :param send_success_message: send a success message if ``True``
     # :param state: state to update (set to RegistrationStates.<>)
     :param telegram_id: telegram id to check
-    :return: ``True`` if user can use bot, else ``False``
+    :return: 2 bool value: 1) can user use bot 2) did it create a new user
     """
-    if await users_service.is_banned(telegram_id):
-        return False
-    await users_service.create_object(object_data={"telegram_id": telegram_id}, skip_if_exists=True)
-    return True
+    is_banned = await users_service.is_banned(telegram_id)
+    create_new_user = is_banned is None
+    if is_banned:
+        return False, create_new_user  # always False
+
+    if create_new_user:  # if we know he's not banned, we don't have to try to create him
+        await users_service.create_object(object_data={"telegram_id": telegram_id}, skip_if_exists=True)
+    return True, create_new_user
     #
     # user_correctly_filled = email_filled = full_name_filled = personal_data_agreement_filled = user is not None
     # if isinstance(user, UserModel):

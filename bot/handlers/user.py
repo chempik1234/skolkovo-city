@@ -5,8 +5,11 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery
+
+from bot_functions.category import handle_category
 from config import States  # , RegistrationStates
 from init import users_service
+from init_configs import BOT_ROOT_CATEGORY
 from translation import translate_string as _  # get_language_for_telegram_id
 
 router = Router()
@@ -60,10 +63,12 @@ router = Router()
 #     await check_user_data(user_id, state, send_success_message=True)
 
 
-@router.callback_query(States.choose_language)
+@router.callback_query(F.data.startswith("language_"))
 async def choose_language_handler(callback: CallbackQuery, state: FSMContext):
     user_id = callback.from_user.id
-    language = callback.data
+    language = callback.data.replace("language_", "")
     await users_service.update_data(user_id, {"language": language})
     await state.set_state(States.default)
     await callback.answer(_("Язык изменён", language))
+    await handle_category(current_category_id=BOT_ROOT_CATEGORY, chat_id=callback.message.chat.id,
+                          category_message=None, state=state)

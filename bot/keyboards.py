@@ -63,11 +63,11 @@ language_keyboards = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(
                 text="🇷🇺",
-                callback_data="ru",
+                callback_data="language_ru",
             ),
             InlineKeyboardButton(
                 text="🇬🇧",
-                callback_data="en",
+                callback_data="language_en",
             ),
         ],
     ],

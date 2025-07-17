@@ -7,12 +7,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from bot_functions.category import handle_category
-from bot_functions.user import check_user_data
-from config import States
+from bot_functions.settings import make_user_choose_language
 from init import category_service
 from init_configs import BOT_ROOT_CATEGORY
-from keyboards import language_keyboards
-from translation import translate_string as _, get_language_for_telegram_id
 
 router = Router()
 
@@ -25,9 +22,7 @@ async def command_start(message: Message, state: FSMContext):
 
 @router.message(Command(commands=["language"]))
 async def command_settings(message: Message, state: FSMContext):
-    await state.set_state(States.choose_language)
-    language = await get_language_for_telegram_id(message.from_user.id)
-    await message.answer(text=_("Выберите язык", language), reply_markup=language_keyboards)
+    await make_user_choose_language(user_id=message.from_user.id)
 
 
 @router.message(Command(commands=["reload"]))

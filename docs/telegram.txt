@@ -1,7 +1,7 @@
 set_state(
   States.default - состояние, в котором не срабатывают callback (для перехода в главное меню)
   States.category - ходим по кнопочкам структуры бота, выводим тексты, ссылки, карты
-  States.choose_language - выбираем язык
+  # States.choose_language - выбираем язык
   # RegistrationStates.full_name - вводим полное имя
   # RegistrationStates.email - вводим email
   # RegistrationStates.agreement - вводим согласие на перс. данные
@@ -11,6 +11,7 @@ callbacks:
 1. "category_None" - перейти в категорию с id (int | None)
 Если у категории есть link, то перейти в неё нельзя
 2. "yes", "no" - универсальные ответы
+3. "language_ru", "language_en" - смена языка
 
 state.update_data({
     "image_messages": [] - список id сообщений медиагрупп для удаления чтоб не висели
