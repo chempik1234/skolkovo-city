@@ -39,6 +39,11 @@ class Category(models.Model):
             max_order = Category.objects.filter(parent_id=self.parent_id).aggregate(models.Max('order_num'))[
                 'order_num__max']
             self.order_num = (max_order or 0) + 1
+
+        if self.id is None:
+            max_id = Category.objects.aggregate(models.Max('id'))[
+                'id__max']
+            self.id = max_id + 1
         super().save(*args, **kwargs)
 
     def __str__(self):
