@@ -47,10 +47,10 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
     send_to = chat_id if chat_id else telegram_id
 
     # erase existing media messages
-    existing_media_messages_ids = await state.get_value("media_messages")
-    if existing_media_messages_ids and isinstance(existing_media_messages_ids, list):
-        await bot.delete_messages(chat_id=send_to, message_ids=existing_media_messages_ids)
-        await state.update_data({"media_messages": []})
+    # existing_media_messages_ids = await state.get_value("media_messages")
+    # if existing_media_messages_ids and isinstance(existing_media_messages_ids, list):
+    #     await bot.delete_messages(chat_id=send_to, message_ids=existing_media_messages_ids)
+    #     await state.update_data({"media_messages": []})
 
     send_images = isinstance(category, CategoryModel) and \
                   isinstance(category.images_urls, list) and all(category.images_urls) and category.images_urls
@@ -61,18 +61,18 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
             for url in photo_urls[:10]
         ]
         media_group[0].parse_mode = "Markdown"
-        messages: list[Message] = await bot.send_media_group(chat_id=send_to, media=media_group)
+        await bot.send_media_group(chat_id=send_to, media=media_group)
 
         # store messages ID so we can erase them later
-        messages_ids = [i.message_id for i in messages]
-        await state.update_data({"media_messages": messages_ids})
+        # messages_ids = [i.message_id for i in messages]
+        # await state.update_data({"media_messages": messages_ids})
 
 
-    if send_images or category_message is None:
-        await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode="Markdown")
-    else:
-        await category_message.edit_text(text=text, parse_mode="Markdown")
-        await category_message.edit_reply_markup(reply_markup=keyboard)
+    # if send_images or category_message is None:
+    await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode="Markdown")
+    # else:
+    #     await category_message.edit_text(text=text, parse_mode="Markdown")
+    #     await category_message.edit_reply_markup(reply_markup=keyboard)
 
 
 async def handle_category(current_category_id, chat_id: int | str | None, category_message, state: FSMContext):
