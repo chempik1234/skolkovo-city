@@ -30,7 +30,7 @@ class CategoryInline(admin.TabularInline):  # admin.StackedInline
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('order_num', 'title_ru', 'title_en', 'parent')
+    list_display = ('title_ru', 'title_en', 'order_num', 'parent')
     list_filter = ('parent',)
     search_fields = ('title_ru', 'title_en',)
     prepopulated_fields = {}
