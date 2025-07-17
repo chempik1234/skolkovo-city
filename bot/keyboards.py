@@ -1,6 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from init import category_service
+from init_configs import BOT_ROOT_CATEGORY
 from models.category import CategoryModel
 from utils import get_title_for_language as _t
 
@@ -34,7 +35,7 @@ async def category_keyboard(category: CategoryModel | None, language: str = "ru"
                 ),
                 InlineKeyboardButton(
                     text='Главное меню',
-                    callback_data='category_None',
+                    callback_data=f'category_{BOT_ROOT_CATEGORY}',
                 ),
             ],
         )

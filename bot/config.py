@@ -29,6 +29,8 @@ class BotConfig(Config):
     POSTGRES_PORT: int = Field("POSTGRES_PORT", default="5432")
     #endregion
 
+    BOT_ROOT_CATEGORY_STR: str = Field("BOT_ROOT_CATEGORY", "None")
+
 
 class States(StatesGroup):
     default = State()

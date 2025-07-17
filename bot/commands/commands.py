@@ -10,6 +10,7 @@ from bot_functions.category import handle_category
 from bot_functions.user import check_user_data
 from config import States
 from init import category_service
+from init_configs import BOT_ROOT_CATEGORY
 from keyboards import language_keyboards
 from translation import translate_string as _, get_language_for_telegram_id
 
@@ -18,7 +19,7 @@ router = Router()
 
 @router.message(Command(commands=["start"]))
 async def command_start(message: Message, state: FSMContext):
-    await handle_category(current_category_id=None, chat_id=message.chat.id,
+    await handle_category(current_category_id=BOT_ROOT_CATEGORY, chat_id=message.chat.id,
                           category_message=None, state=state)
 
 

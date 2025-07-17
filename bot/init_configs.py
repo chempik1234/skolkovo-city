@@ -4,6 +4,8 @@ from redis_conn import get_redis_url
 
 bot_config = BotConfig()
 
+BOT_ROOT_CATEGORY = int(bot_config.BOT_ROOT_CATEGORY_STR) if bot_config.BOT_ROOT_CATEGORY_STR != "None" else None
+
 postgres_url = get_asyncpg_url(
     bot_config.POSTGRES_USER,
     bot_config.POSTGRES_PASSWORD,
