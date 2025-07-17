@@ -26,7 +26,7 @@ async def category_keyboard(category: CategoryModel | None, language: str = "ru"
                 )
             ]
         )
-    if category_id is not None:
+    if category_id != BOT_ROOT_CATEGORY:
         keyboard.append(
             [
                 InlineKeyboardButton(
