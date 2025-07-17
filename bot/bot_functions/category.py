@@ -53,10 +53,9 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         await state.update_data({"media_messages": []})
 
     send_images = isinstance(category, CategoryModel) and \
-                  isinstance(category.images_urls, list) and all(category.images_urls)
+                  isinstance(category.images_urls, list) and all(category.images_urls) and category.images_urls
     if send_images:
         photo_urls = category.images_urls
-        print(photo_urls)
         media_group = [
             InputMediaPhoto(media=url)
             for url in photo_urls[:10]
