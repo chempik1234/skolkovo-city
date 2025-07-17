@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InputMediaPhoto
 
@@ -9,6 +11,12 @@ from translation import (translate_string as _,
                          get_language_for_telegram_id as _l,
                          get_title_description_for_language as _tdl)
 from utils import remove_newline_escapes
+
+
+async def delete_media_messages_from_state(state: FSMContext, chat_id: int | str):
+    existing_media_messages_ids = await state.get_value("media_messages")
+    if existing_media_messages_ids and isinstance(existing_media_messages_ids, list):
+        await bot.delete_messages(chat_id=chat_id, message_ids=existing_media_messages_ids)
 
 
 async def send_category(category_message: Message | None, chat_id: int | str | None, category: CategoryModel | None,
@@ -47,10 +55,8 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
     send_to = chat_id if chat_id else telegram_id
 
     # erase existing media messages
-    existing_media_messages_ids = await state.get_value("media_messages")
-    if existing_media_messages_ids and isinstance(existing_media_messages_ids, list):
-        await bot.delete_messages(chat_id=send_to, message_ids=existing_media_messages_ids)
-        await state.update_data({"media_messages": []})
+    asyncio.create_task(delete_media_messages_from_state(state, send_to))
+    await state.update_data({"media_messages": []})
 
     send_images = isinstance(category, CategoryModel) and \
                   isinstance(category.images_urls, list) and all(category.images_urls) and category.images_urls
