@@ -1,0 +1,317 @@
+{
+  "title": "Telegram Bot Metrics",
+  "description": "Comprehensive monitoring for Telegram bot",
+  "tags": [
+    "telegram",
+    "bot",
+    "monitoring"
+  ],
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Category Clicks Distribution",
+      "type": "barchart",
+      "gridPos": {
+        "x": 0,
+        "y": 30,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "topk(20, sum by(button_text) (rate(tgbot_category_clicks_total[1y]))",
+          "legendFormat": "{{button_text}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "options": {
+        "barWidth": 0.9,
+        "xAxis": {
+          "show": true
+        },
+        "yAxis": {
+          "show": true,
+          "align": true
+        },
+        "legend": {
+          "show": true,
+          "placement": "right",
+          "values": [
+            "total"
+          ]
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Category Clicks Proportion",
+      "type": "piechart",
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by(button_text) (tgbot_category_clicks_total))",
+          "legendFormat": "{{button_text}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "pieType": "pie",
+        "displayLabels": [
+          "name",
+          "percent"
+        ],
+        "legend": {
+          "values": [
+            "percent"
+          ],
+          "placement": "right"
+        }
+      }
+    },
+    {
+      "title": "Last Activity by Category",
+      "type": "table",
+      "gridPos": {
+        "x": 12,
+        "y": 40,
+        "w": 12,
+        "h": 10
+      },
+      "targets": [
+        {
+          "expr": "tgbot_category_last_click_timestamp",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "columns": [
+        {
+          "text": "Category",
+          "value": "button_text"
+        },
+        {
+          "text": "Last Click",
+          "value": "Value",
+          "type": "time",
+          "unit": "fromNow"
+        }
+      ],
+      "styles": [
+        {
+          "alias": "Time Since Last Click",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Value",
+          "type": "date"
+        }
+      ]
+    },
+    {
+      "title": "Requests Rate",
+      "type": "graph",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "rate(tgbot_requests_total[1m])",
+          "legendFormat": "{{method}} {{path_template}}",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "title": "Response Status Codes",
+      "type": "piechart",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by(status_code) (rate(tgbot_responses_total[1m]))",
+          "legendFormat": "{{status_code}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Request Duration (99th percentile)",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(tgbot_request_duration_seconds_bucket[1m])) by (le))",
+          "format": "s",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "title": "Requests in Progress",
+      "type": "gauge",
+      "gridPos": {
+        "x": 6,
+        "y": 8,
+        "w": 6,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "sum(tgbot_requests_in_progress)",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Exceptions by Type",
+      "type": "barchart",
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by(exception_type) (rate(tgbot_exceptions_total[1m]))",
+          "legendFormat": "{{exception_type}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "title": "Top Slow Endpoints",
+      "type": "table",
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 14
+      },
+      "targets": [
+        {
+          "expr": "topk(5, histogram_quantile(0.95, sum by(path_template) (rate(tgbot_request_duration_seconds_bucket[1m]))))",
+          "instant": true,
+          "refId": "A",
+          "format": "table"
+        }
+      ],
+      "columns": [
+        {
+          "text": "Endpoint",
+          "value": "path_template"
+        },
+        {
+          "text": "Latency (95%)",
+          "value": "Value",
+          "unit": "s"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "path",
+        "label": "Path",
+        "type": "query",
+        "query": "label_values(tgbot_requests_total, path_template)"
+      }
+    ]
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Errors",
+        "datasource": "Prometheus",
+        "expr": "sum(rate(tgbot_exceptions_total[1m])) by (exception_type) > 0",
+        "title": "Exception: {{exception_type}}",
+        "tags": [
+          "error"
+        ]
+      }
+    ]
+  }
+}

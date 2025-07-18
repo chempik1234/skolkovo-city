@@ -1,5 +1,6 @@
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
+from aiohttp import web
 
 from db.session import create_sqlalchemy_sessionmaker
 from init_configs import postgres_url, bot_config, redis_url_dp, redis_url_users
@@ -25,4 +26,6 @@ category_repo = CategoryRepositoryPostgres(postgres_conn)
 category_service = CategoryService(category_repo)
 
 bot = Bot(token=bot_config.API_TOKEN)
+app = web.Application()
+
 dp = Dispatcher(storage=redis_conn_dp)

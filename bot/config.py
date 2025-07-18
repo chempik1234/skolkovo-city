@@ -10,6 +10,7 @@ load_dotenv("../config/.env", override=True)
 
 class BotConfig(Config):
     API_TOKEN: str = Field("API_TOKEN")
+    WEBHOOK_SECRET: str = Field("WEBHOOK_SECRET", default="1234")
 
     #region redis conf
     REDIS_HOST: str = Field("REDIS_HOST")
@@ -30,6 +31,24 @@ class BotConfig(Config):
     #endregion
 
     BOT_ROOT_CATEGORY_STR: str = Field("BOT_ROOT_CATEGORY", "None")
+    BOT_WEBHOOK_HOST: str = Field("BOT_WEBHOOK_HOST", default="0.0.0.0")
+    BOT_WEBHOOK_BASE: str = Field("BOT_WEBHOOK_BASE", default="")
+    BOT_WEBHOOK_PORT: int = Field("BOT_WEBHOOK_PORT", default="5000")
+    BOT_WEBHOOK_PATH: str = Field("BOT_WEBHOOK_PATH", default="/webhook")
+
+    _BOT_USE_WEBHOOK: bool = Field("BOT_USE_WEBHOOK")
+
+    @property
+    def BOT_WEBHOOK_URL(self):
+        return f"https://{self.BOT_WEBHOOK_BASE}{self.BOT_WEBHOOK_PATH}"
+
+    @property
+    def BOT_USE_WEBHOOK(self):
+        return self._BOT_USE_WEBHOOK == "True"
+
+    @property
+    def USE_PROMETHEUS(self):
+        return self.BOT_USE_WEBHOOK
 
 
 class States(StatesGroup):

@@ -33,6 +33,8 @@ services:
         condition: service_healthy
     env_file:
       - ../config/.env
+    ports:
+      - "5000:5000"
 
   db:
     container_name: db
@@ -67,6 +69,60 @@ services:
       timeout: 1s
       retries: 3
 
+  #region monitoring made by donBarbos https://github.com/donBarbos/telegram-bot-template
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude"
+      - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+
+  prometheus:
+    image: prom/prometheus:v2.43.0
+    volumes:
+      - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    depends_on:
+      - bot
+      - node-exporter
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--web.enable-lifecycle"
+
+  grafana:
+    image: grafana/grafana:8.5.22
+    container_name: grafana
+    restart: unless-stopped
+    env_file:
+      - ../config/.env.grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - ../grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../grafana/preload_dashboards:/var/lib/grafana/dashboards
+      - grafana-data:/var/lib/grafana
+    user: "0"
+  #endregion
+
 volumes:
   postgres_data:
   redis-data:
+  prometheus-data:
+  grafana-data:
