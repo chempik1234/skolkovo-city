@@ -88,7 +88,7 @@ class UserService:
             if user is None:
                 return None
 
-            self.user_cache_repo.cache_object_field(user, "field_name")
+            self.user_cache_repo.cache_object_field(user, field_name=field_name)
 
             result = getattr(user, field_name)
         return result
