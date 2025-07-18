@@ -12,6 +12,32 @@ if TYPE_CHECKING:
     from aiohttp.web_request import Request
     from aiohttp.web_response import StreamResponse
 
+CATEGORY_METRICS_PREFIX = "tgbot_category"
+
+category_counter = prometheus_client.Counter(
+    name=f"{CATEGORY_METRICS_PREFIX}_clicks_total",
+    documentation="Total clicks by button text",
+    labelnames=["button_text"],
+    registry=prometheus_client.REGISTRY
+)
+
+category_histogram = prometheus_client.Histogram(
+    name=f"{CATEGORY_METRICS_PREFIX}_clicks_distribution",
+    documentation="Distribution of clicks by button text",
+    labelnames=["button_text"],
+    buckets=[1, 5, 10, 50, 100, 500, 1000, 5000],
+    registry=prometheus_client.REGISTRY
+)
+
+
+async def track_category_click_async(button_text: str):
+    return track_category_click(button_text)
+
+
+def track_category_click(button_text: str):
+    category_counter.labels(button_text=button_text).inc()
+    category_histogram.labels(button_text=button_text).observe(1)
+
 METRICS_PREFIX = "tgbot"
 
 

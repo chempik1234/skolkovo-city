@@ -46,6 +46,10 @@ class BotConfig(Config):
     def BOT_USE_WEBHOOK(self):
         return self._BOT_USE_WEBHOOK == "True"
 
+    @property
+    def USE_PROMETHEUS(self):
+        return self.BOT_USE_WEBHOOK
+
 
 class States(StatesGroup):
     default = State()

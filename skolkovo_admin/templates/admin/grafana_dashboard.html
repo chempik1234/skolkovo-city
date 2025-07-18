@@ -1,0 +1,23 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+    <h1>Grafana Dashboard</h1>
+    <iframe></iframe>
+  <script>
+    async function getSrc() {
+      const res = await fetch("{{ grafana_url }}", {
+        method: 'GET',
+        headers: {
+          "Authorization": "{{ grafana_token }}"
+        }
+      });
+      const blob = await res.blob();
+      const urlObject = URL.createObjectURL(blob);
+      document.querySelector('iframe').setAttribute("src", urlObject)
+    }
+    getSrc();
+</script>
+
+
+          <br class="clear">
+{% endblock %}

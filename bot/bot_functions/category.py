@@ -5,7 +5,9 @@ from aiogram.types import Message, InputMediaPhoto
 
 from config import States
 from init import bot, category_service
+from init_configs import bot_config
 from keyboards import category_keyboard
+from middlewares.prometheus import track_category_click_async
 from models.category import CategoryModel
 from translation import (translate_string as _,
                          get_language_for_telegram_id as _l,
@@ -95,5 +97,15 @@ async def handle_category(current_category_id, chat_id: int | str | None, catego
     :return: None
     """
     category = await category_service.get_object(current_category_id)
+
+    if bot_config.USE_PROMETHEUS:
+        if category is None:
+            parent_title = "None"
+            category_title = "None"
+        else:
+            parent_category = await category_service.get_object(category.parent_id)
+            parent_title = parent_category.title_ru if parent_category is not None else "None"
+            category_title = category.title_ru
+        asyncio.create_task(track_category_click_async(f"{category_title} ({parent_title})"))
 
     await send_category(category_message, chat_id, category, state)

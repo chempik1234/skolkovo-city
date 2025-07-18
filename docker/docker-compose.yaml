@@ -114,9 +114,9 @@ services:
     depends_on:
       - prometheus
     volumes:
-      - ../configs/grafana/datasources:/etc/grafana/provisioning/datasources
-      - ../configs/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ../configs/grafana/node-exporter.json:/var/lib/grafana/dashboards/node-exporter.json
+      - ../grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../grafana/preload_dashboards:/var/lib/grafana/dashboards
       - grafana-data:/var/lib/grafana
     user: "0"
   #endregion
