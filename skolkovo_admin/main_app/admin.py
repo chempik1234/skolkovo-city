@@ -35,7 +35,7 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('title_ru', 'title_en',)
     prepopulated_fields = {}
     inlines = (CategoryInline,)
-    readonly_fields = ('images_urls_display',)
+    # readonly_fields = ('images_urls_display',)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -51,24 +51,24 @@ class CategoryAdmin(admin.ModelAdmin):
     def has_children(self, obj):
         return obj.children.exists()
 
-    def images_urls_display(self, obj):
-        if not obj.images_urls:
-            return "-"
-
-        images = []
-        for url in obj.images_urls:
-            if url:
-                images.append(
-                    f'<img src="{escape(url.strip())}" style="max-width: 200px; max-height: 200px; margin: 5px;">'
-                )
-
-        return format_html('<div style="display: flex; flex-wrap: wrap;">{}</div>',
-                           mark_safe("".join(images)))
+    # def images_urls_display(self, obj):
+    #     if not obj.images_urls:
+    #         return "-"
+    #
+    #     images = []
+    #     for url in obj.images_urls:
+    #         if url:
+    #             images.append(
+    #                 f'<img src="{escape(url.strip())}" style="max-width: 200px; max-height: 200px; margin: 5px;">'
+    #             )
+    #
+    #     return format_html('<div style="display: flex; flex-wrap: wrap;">{}</div>',
+    #                        mark_safe("".join(images)))
 
     has_children.boolean = True
     has_children.short_description = "Есть подкатегории"
     parent_link.short_description = "Родительская категория"
-    images_urls_display.short_description = "Изображения"
+    # images_urls_display.short_description = "Изображения"
 
 
 @admin.action(description="Забанить в тг")
