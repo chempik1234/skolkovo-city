@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy.util import await_only
 
 from db.models import UserDataModel
@@ -71,16 +73,22 @@ class UserService:
         return self._to_model(result)
 
     async def is_banned(self, telegram_id: int, no_cache_check=False) -> bool | None:
+        return await self._get_object_field(telegram_id=telegram_id, no_cache_check=no_cache_check, field_name="is_banned")
+
+    async def is_admin(self, telegram_id: int, no_cache_check=False) -> bool | None:
+        return await self._get_object_field(telegram_id=telegram_id, no_cache_check=no_cache_check, field_name="is_admin")
+
+    async def _get_object_field(self, telegram_id: int, field_name: str, no_cache_check: bool = False) -> Any:
         result = None
         if not no_cache_check:
-            result = self.user_cache_repo.get_object_field(telegram_id, "is_banned")
+            result = self.user_cache_repo.get_object_field(telegram_id, field_name)
 
         if result is None:
             user = await self._get_object(telegram_id=telegram_id, no_cache_check=no_cache_check)
             if user is None:
                 return None
 
-            self.user_cache_repo.cache_object_field(user, "is_banned")
+            self.user_cache_repo.cache_object_field(user, "field_name")
 
-            result = user.is_banned
+            result = getattr(user, field_name)
         return result
