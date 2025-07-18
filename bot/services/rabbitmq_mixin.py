@@ -27,7 +27,7 @@ class RabbitMQMixin:
             self.exchange = await self.channel.declare_exchange(name=self.exchange_name, type=self.exchange_type)
 
         if not self.queue:
-            self.queue = await self.channel.declare_queue(name=self.queue_name, exclusive=True)
+            self.queue = await self.channel.declare_queue(name=self.queue_name)
             await self.queue.bind(self.exchange, routing_key=self.routing_key)
 
     async def run(self):

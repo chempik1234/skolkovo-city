@@ -14,7 +14,6 @@ from translation import translate_string as _  # get_language_for_telegram_id
 
 router = Router()
 
-
 # @router.message(RegistrationStates.full_name)
 # async def full_name_input_handler(message: Message, state: FSMContext):
 #     full_name = message.text

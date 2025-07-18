@@ -15,15 +15,16 @@ class NewsSenderRepositoryRabbitMQ(NewsSenderRepositoryBase, RabbitMQMixin):
 
     async def send(self, json_content: str, send_to_ids: Iterable[int]):
         for telegram_id in send_to_ids:
+            body = ''.join(['{"telegram_id": ', str(telegram_id), ', "content": ', json_content, '}'])
             asyncio.create_task(self.publish(
-                body=''.join(['{"telegram_id: ', telegram_id, ', "content": ', json_content, '}']).encode('utf-8'),
+                body=body.encode('utf-8'),
             ))
 
-    def get_message_data(self, message: AbstractIncomingMessage) -> dict[str, int | str]:
+    def get_message_data(self, message: AbstractIncomingMessage) -> dict[str, int | dict[str, Any]]:
         queue_message = json.loads(message.body.decode('utf-8'))
         return queue_message
 
-    async def read(self) -> AsyncGenerator[dict[str, int | str], None]:
+    async def read(self) -> AsyncGenerator[dict[str, int | dict[str, Any]], None]:
         await self.connect()
         async with self.queue.iterator() as queue_iterator:
             async for message in queue_iterator:

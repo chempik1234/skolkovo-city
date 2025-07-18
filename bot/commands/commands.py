@@ -37,7 +37,9 @@ async def command_reload(message: Message, state: FSMContext):
 
 @router.message(Command(commands=["news"]))
 async def command_news(message: Message, state: FSMContext):
-    await message.answer(
-        "📢 Отправьте сообщение для рассылки (текст, фото, видео, gif):"
-    )
-    await state.set_state(NewsForm.waiting_for_content)
+    user_id = message.from_user.id
+    if await users_service.is_admin(user_id):
+        await message.answer(
+            "📢 Отправьте сообщение для рассылки (текст, фото, видео, gif):"
+        )
+        await state.set_state(NewsForm.waiting_for_content)

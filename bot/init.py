@@ -50,4 +50,8 @@ news_service = NewsSenderService(news_repo)
 bot = Bot(token=bot_config.API_TOKEN)
 app = web.Application()
 
-dp = Dispatcher(storage=redis_conn_dp)
+
+def create_dp() -> Dispatcher:
+    return Dispatcher(storage=redis_conn_dp)
+
+dp = create_dp()

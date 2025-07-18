@@ -14,6 +14,10 @@ x-bot-template: &bot-template
   networks:
     - bot-network
 
+x-worker-template: &worker-template
+  <<: *bot-template
+  command: python news_worker.py
+
 services:
   admin:
     build:
@@ -80,6 +84,26 @@ services:
     environment:
       - BOT_WEBHOOK_PORT=5000
       - BOT_INSTANCE_NAME=bot3
+  #endregion
+
+  #region worker
+  worker:
+    <<: *worker-template
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    expose:
+      - "6000"
+    environment:
+      - BOT_WEBHOOK_PORT=6000
+      - BOT_INSTANCE_NAME=worker
+    scale: 3
+    networks:
+      - bot-network
   #endregion
 
   db:

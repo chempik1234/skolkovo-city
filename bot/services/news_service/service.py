@@ -1,5 +1,5 @@
 import json
-from typing import Iterable
+from typing import Iterable, AsyncGenerator, Any
 
 from aiogram.types import Message
 
@@ -14,8 +14,8 @@ class NewsSenderService:
         json_content = self.serialize_message(message)
         await self.news_repo.send(json_content, send_to_ids)
 
-    async def read(self):
-        for obj in self.news_repo.read():
+    async def read(self) -> AsyncGenerator[dict[str, int | dict[str, Any]], None]:
+        async for obj in self.news_repo.read():
             yield obj
 
     def serialize_message(self, message: Message) -> str:
