@@ -5,7 +5,7 @@ import threading
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp.web_runner import AppRunner, TCPSite
 
-from init import bot, dp, app, reloader_service, reloader_repo
+from init import bot, dp, app, reloader_service, news_service
 from handlers import routers_list
 from commands import router as commands_router
 from init_configs import bot_config
@@ -16,6 +16,7 @@ from web.metrics import MetricsView
 
 async def on_startup() -> None:
     asyncio.create_task(reloader_service.run_forever())
+    asyncio.create_task(news_service.run_forever())
 
     dp.include_routers(commands_router, *routers_list)
     dp.message.outer_middleware(CheckRegistrationMiddleware())

@@ -9,6 +9,8 @@ from init_configs import postgres_url, bot_config, redis_url_dp, redis_url_users
 from redis_conn import create_redis
 from services.category_service.repositories.postgres import CategoryRepositoryPostgres
 from services.category_service.service import CategoryService
+from services.news_service.repositories.rabbitmq import NewsSenderRepositoryRabbitMQ
+from services.news_service.service import NewsSenderService
 from services.reloader_service.repositories.rabbitmq import ReloaderRepositoryRabbitMQ
 from services.reloader_service.service import ReloaderService
 from services.user_service.repositories.cache.redis_repo import UserCacheRepositoryRedis
@@ -41,6 +43,9 @@ category_service = CategoryService(category_repo)
 
 reloader_repo = ReloaderRepositoryRabbitMQ(rabbitmq_url, "reloading")
 reloader_service = ReloaderService(reloader_repo, category_service.reload_categories)
+
+news_repo = NewsSenderRepositoryRabbitMQ(rabbitmq_url, "news")
+news_service = NewsSenderService(news_repo)
 
 bot = Bot(token=bot_config.API_TOKEN)
 app = web.Application()

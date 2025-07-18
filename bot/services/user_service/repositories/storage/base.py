@@ -1,3 +1,5 @@
+from typing import Any
+
 from db.models import UserDataModel
 
 
@@ -9,4 +11,7 @@ class UserStorageRepositoryBase:
         raise NotImplementedError()
 
     async def create_object(self, data_dict) -> UserDataModel:
+        raise NotImplementedError()
+
+    async def get_objects_field(self, field_name: str) -> list[Any] | None:
         raise NotImplementedError()

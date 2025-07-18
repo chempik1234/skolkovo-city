@@ -18,3 +18,9 @@ class UserCacheRepositoryBase:
 
     def get_object_field(self, telegram_id, field_name: str) -> Any:
         raise NotImplementedError()
+
+    def get_objects_field(self, field_name: str) -> list[Any] | None:
+        raise NotImplementedError()
+
+    def cache_objects_field(self, values: list[Any], field_name: str) -> None:
+        raise NotImplementedError()

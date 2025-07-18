@@ -60,6 +60,11 @@ class States(StatesGroup):
     category = State()
 
 
+class NewsForm(StatesGroup):
+    waiting_for_content = State()
+    waiting_for_confirmation = State()
+
+
 # class RegistrationStates(StatesGroup):
 #     full_name = State()
 #     email = State()

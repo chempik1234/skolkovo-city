@@ -92,3 +92,16 @@ class UserService:
 
             result = getattr(user, field_name)
         return result
+
+    async def get_objects_field(self, field_name: str, no_cache_check: bool = False):
+        result = None
+        if not no_cache_check:
+            result = self.user_cache_repo.get_objects_field(field_name)
+
+        if result is None:
+            result = await self.user_storage_repo.get_objects_field(field_name)
+            if result is None:
+                return None
+
+            self.user_cache_repo.cache_objects_field(result, field_name=field_name)
+        return result

@@ -61,3 +61,12 @@ class UserCacheRepositoryRedis(UserCacheRepositoryBase):
         if UserDataModel.__annotations__.get(field_name, None) is Mapped[bool]:
             result = True if int(result) == 1 else False
         return result
+
+    def get_objects_field(self, field_name: str) -> list[Any] | None:
+        result_list: None | bytes = self.redis.get(f"__{field_name}")
+        if result_list is None:
+            return None
+        return json.loads(result_list)
+
+    def cache_objects_field(self, values: list[Any], field_name: str) -> None:
+        self.redis.set(f"__{field_name}", json.dumps(values), ex=self.expire_seconds)

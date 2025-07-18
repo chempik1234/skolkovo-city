@@ -1,5 +1,8 @@
+from typing import Any
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.testing import db_spec
 
 from db.models import UserDataModel
 from services.user_service.repositories.storage.base import UserStorageRepositoryBase
@@ -56,3 +59,8 @@ class UserStorageRepositoryPostgres(UserStorageRepositoryBase):
                 return new_object
             except IntegrityError:
                 await db_session.rollback()
+
+    async def get_objects_field(self, field_name: str) -> list[Any] | None:
+        async with self.session_maker(expire_on_commit=False) as db_session:
+            result = await db_session.execute(select(getattr(UserDataModel, field_name)))
+            return result.scalars().all()
