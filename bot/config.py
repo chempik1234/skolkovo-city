@@ -1,7 +1,9 @@
 import os
+import typing
 
 from aiogram.fsm.state import StatesGroup, State
 from betterconf import Config
+from betterconf.caster import IntCaster, BoolCaster
 from betterconf.config import Field
 from dotenv import load_dotenv
 
@@ -11,6 +13,13 @@ load_dotenv("../config/.env", override=True)
 class BotConfig(Config):
     API_TOKEN: str = Field("API_TOKEN")
     WEBHOOK_SECRET: str = Field("WEBHOOK_SECRET", default="1234")
+
+    RABBITMQ_HOST: str = Field("RABBITMQ_HOST", default="localhost")
+    RABBITMQ_PORT: str = Field("RABBITMQ_PORT", default="5672")
+    RABBITMQ_VIRTUAL_HOST: str = Field("RABBITMQ_VIRTUAL_HOST", default="/")
+    RABBITMQ_USER: str = Field("RABBITMQ_USER", default="guest")
+    RABBITMQ_PASSWORD: str = Field("RABBITMQ_PASSWORD", default="guest")
+    RABBITMQ_HEARTBEAT: int = Field("RABBITMQ_HEARTBEAT", default=5, caster=IntCaster())
 
     #region redis conf
     REDIS_HOST: str = Field("REDIS_HOST")
@@ -36,17 +45,12 @@ class BotConfig(Config):
     BOT_WEBHOOK_PORT: int = Field("BOT_WEBHOOK_PORT", default="5000")
     BOT_WEBHOOK_PATH: str = Field("BOT_WEBHOOK_PATH", default="/webhook")
 
-    _BOT_USE_WEBHOOK: bool = Field("BOT_USE_WEBHOOK")
+    BOT_USE_WEBHOOK: bool = Field("BOT_USE_WEBHOOK", caster=BoolCaster())
 
     @property
     def BOT_WEBHOOK_URL(self):
         return f"https://{self.BOT_WEBHOOK_BASE}{self.BOT_WEBHOOK_PATH}"
 
-    @property
-    def BOT_USE_WEBHOOK(self):
-        return self._BOT_USE_WEBHOOK == "True"
-
-    @property
     def USE_PROMETHEUS(self):
         return self.BOT_USE_WEBHOOK
 

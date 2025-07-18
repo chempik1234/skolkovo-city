@@ -8,7 +8,7 @@ from aiogram.types import Message
 
 from bot_functions.category import handle_category
 from bot_functions.settings import make_user_choose_language
-from init import category_service, users_service
+from init import category_service, users_service, reloader_service
 from init_configs import BOT_ROOT_CATEGORY
 
 router = Router()
@@ -29,8 +29,6 @@ async def command_settings(message: Message, state: FSMContext):
 async def command_reload(message: Message, state: FSMContext):
     user_id = message.from_user.id
     if await users_service.is_admin(user_id):
-        await message.answer(text="Структура ботов начинает перезагружаться, подождите")
-        start_time = time.time()
-        category_service.reload_categories()
-        end_time = time.time()
-        await message.answer(text=f"Структура ботов перезагружена {round(end_time - start_time, 4)}с")
+        await message.answer(text="Структура ботов перезагружается, подождите")
+        await reloader_service.reload_instances()
+        await message.answer(text="Запрос на перезагрузку отправлен в очередь")

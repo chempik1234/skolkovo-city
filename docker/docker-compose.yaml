@@ -39,12 +39,13 @@ services:
 
   #region bot
   bot1:
-    container_name: bot1
     <<: *bot-template
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     ports:
       - "5001:5000"
@@ -58,6 +59,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "5002:5000"
     environment:
@@ -69,6 +72,8 @@ services:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     ports:
       - "5003:5000"
@@ -110,6 +115,23 @@ services:
       test: [ "CMD-SHELL", "redis-cli ping" ]
       interval: 10s
       timeout: 1s
+      retries: 3
+    networks:
+      - bot-network
+
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    hostname: rabbitmq
+    restart: always
+    env_file:
+      - ../config/.env
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: [ "CMD-SHELL", "rabbitmq-diagnostics -q ping" ]
+      interval: 30s
+      timeout: 10s
       retries: 3
     networks:
       - bot-network

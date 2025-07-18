@@ -29,3 +29,4 @@ redis_url_users = get_redis_url(
     bot_config.REDIS_PORT,
     bot_config.REDIS_DB_FOR_USERS,
 )
+rabbitmq_url = f"amqp://{bot_config.RABBITMQ_USER}:{bot_config.RABBITMQ_PASSWORD}@{bot_config.RABBITMQ_HOST}:{bot_config.RABBITMQ_PORT}/"

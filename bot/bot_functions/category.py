@@ -98,7 +98,7 @@ async def handle_category(current_category_id, chat_id: int | str | None, catego
     """
     category = await category_service.get_object(current_category_id)
 
-    if bot_config.USE_PROMETHEUS:
+    if bot_config.USE_PROMETHEUS():
         if category is None:
             parent_title = "None"
             category_title = "None"
