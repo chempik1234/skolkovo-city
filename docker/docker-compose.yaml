@@ -1,3 +1,19 @@
+x-bot-template: &bot-template
+  build:
+    dockerfile: ../docker/Dockerfile.bot
+    context: ../bot
+  command: python main.py
+  restart: unless-stopped
+  env_file:
+    - ../config/.env
+  healthcheck:
+    test: [ "CMD", "curl", "-f", "http://localhost:5000/metrics" ]
+    interval: 30s
+    timeout: 5s
+    retries: 3
+  networks:
+    - bot-network
+
 services:
   admin:
     build:
@@ -18,23 +34,48 @@ services:
       sh -c "python manage.py migrate ; 
       python manage.py migrate sessions ; 
       python manage.py runserver 0.0.0.0:8080 --noreload"
+    networks:
+      - bot-network
 
-  bot:
-    container_name: bot
-    build:
-      dockerfile: ../docker/Dockerfile.bot
-      context: ../bot
-    command: python main.py
-    restart: always
+  #region bot
+  bot1:
+    container_name: bot1
+    <<: *bot-template
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-    env_file:
-      - ../config/.env
     ports:
-      - "5000:5000"
+      - "5001:5000"
+    environment:
+      - BOT_WEBHOOK_PORT=5000
+      - BOT_INSTANCE_NAME=bot1
+  bot2:
+    <<: *bot-template
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "5002:5000"
+    environment:
+      - BOT_WEBHOOK_PORT=5000
+      - BOT_INSTANCE_NAME=bot2
+  bot3:
+    <<: *bot-template
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "5003:5000"
+    environment:
+      - BOT_WEBHOOK_PORT=5000
+      - BOT_INSTANCE_NAME=bot3
+  #endregion
 
   db:
     container_name: db
@@ -50,6 +91,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - bot-network
 
   redis:
     container_name: redis
@@ -68,6 +111,8 @@ services:
       interval: 10s
       timeout: 1s
       retries: 3
+    networks:
+      - bot-network
 
   #region monitoring made by donBarbos https://github.com/donBarbos/telegram-bot-template
   node-exporter:
@@ -85,16 +130,18 @@ services:
       - "--path.sysfs=/host/sys"
       - "--collector.filesystem.mount-points-exclude"
       - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+    networks:
+      - bot-network
 
   prometheus:
     image: prom/prometheus:v2.43.0
     volumes:
       - ../prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../prometheus/targets.json:/etc/prometheus/targets.json
       - prometheus-data:/prometheus
     ports:
       - "9090:9090"
     depends_on:
-      - bot
       - node-exporter
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -102,6 +149,8 @@ services:
       - "--web.console.libraries=/etc/prometheus/console_libraries"
       - "--web.console.templates=/etc/prometheus/consoles"
       - "--web.enable-lifecycle"
+    networks:
+      - bot-network
 
   grafana:
     image: grafana/grafana:8.5.22
@@ -119,7 +168,24 @@ services:
       - ../grafana/preload_dashboards:/var/lib/grafana/dashboards
       - grafana-data:/var/lib/grafana
     user: "0"
+    networks:
+      - bot-network
   #endregion
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/conf.d:/etc/nginx/conf.d
+      - ../nginx/ssl:/etc/nginx/ssl
+    networks:
+      - bot-network
+
+networks:
+  bot-network:
+    driver: bridge
 
 volumes:
   postgres_data:

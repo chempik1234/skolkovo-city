@@ -1,0 +1,9 @@
+[
+  {
+    "targets": ["bot1:5000", "bot2:5000"],
+    "labels": {
+      "service": "telegram-bot",
+      "env": "production"
+    }
+  }
+]
