@@ -10,6 +10,7 @@ class ReloaderRepositoryRabbitMQ(RabbitMQMixin, ReloaderRepositoryBase):
         super().__init__(url, exchange_name, exchange_type=ExchangeType.FANOUT, routing_key="reloading_queue")
 
     async def handle_message(self, message: AbstractIncomingMessage):
+        await message.ack()
         self.reload()
 
     async def notify(self):
