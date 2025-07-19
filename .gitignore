@@ -22,3 +22,4 @@ fabric.properties
 
 # Actual configs
 config/.env
+config/.env.grafana
