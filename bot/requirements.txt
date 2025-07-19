@@ -45,6 +45,7 @@ rfc3339==6.2
 setuptools==80.9.0
 SQLAlchemy==2.0.41
 sqlparse==0.5.3
+structlog==25.4.0
 typing-inspection==0.4.1
 typing_extensions==4.14.1
 tzdata==2025.2

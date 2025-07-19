@@ -1,11 +1,11 @@
-import logging
+import structlog
 
 import aio_pika
 from aio_pika import Message
 from aio_pika.abc import AbstractExchange, AbstractChannel, AbstractConnection, AbstractQueue, ExchangeType, \
     AbstractIncomingMessage
 
-logger = logging.getLogger("rabbitmq_mixin")
+logger = structlog.get_logger(name="rabbitmq_mixin")
 
 
 class RabbitMQMixin:
@@ -34,11 +34,11 @@ class RabbitMQMixin:
             self.queue = await self.channel.declare_queue(name=self.queue_name)
             await self.queue.bind(self.exchange, routing_key=self.routing_key)
 
-        logger.info("connected rabbitmq_mixin", extra={"url": self.url})
+        logger.info("connected rabbitmq_mixin", extra_data={"url": self.url})
 
     async def run(self):
         await self.connect()
-        logger.info("starting consumer", extra={"url": self.url, "queue_name": self.queue_name})
+        logger.info("starting consumer", extra_data={"url": self.url, "queue_name": self.queue_name})
         await self.queue.consume(self.handle_message)
 
     async def handle_message(self, message: AbstractIncomingMessage):
@@ -46,7 +46,7 @@ class RabbitMQMixin:
 
     async def stop(self):
         if self.connection:
-            logger.info("stop rabbitmq", extra={"url": self.url, "queue_name": self.queue_name})
+            logger.info("stop rabbitmq", extra_data={"url": self.url, "queue_name": self.queue_name})
             await self.connection.close()
 
     async def publish(self, body: bytes, routing_key: str | None = None):

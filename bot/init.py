@@ -1,5 +1,6 @@
-import logging
+import structlog
 
+import structlog
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
@@ -56,4 +57,9 @@ def create_dp() -> Dispatcher:
 
 dp = create_dp()
 
-logging.basicConfig(level=logging.INFO)
+structlog.configure(
+    processors=[
+        structlog.processors.dict_tracebacks,
+        structlog.processors.JSONRenderer()
+    ]
+)

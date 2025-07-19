@@ -1,4 +1,4 @@
-import logging
+import structlog
 import uuid
 
 from aiogram import Router, F
@@ -8,7 +8,7 @@ from aiogram.types import CallbackQuery
 from bot_functions.category import handle_category
 from utils import get_logging_extra
 
-logger = logging.getLogger("handlers.category")
+logger = structlog.get_logger(name="handlers.category")
 
 router = Router()
 
@@ -18,7 +18,7 @@ async def category_callback_handler(callback: CallbackQuery, state: FSMContext):
     logging_extra = get_logging_extra(callback.from_user.id)
     logging_extra["category_callback"] = callback.data
 
-    logger.info("category click", logging_extra)
+    logger.info("category click", extra_data=logging_extra)
 
     category_id = callback.data.replace('category_', '')
     if category_id == 'None':
@@ -33,8 +33,8 @@ async def category_callback_handler(callback: CallbackQuery, state: FSMContext):
     logging_extra["category_id"] = category_id
 
     try:
-        logger.info("handle category click", extra=logging_extra)
+        logger.info("handle category click", extra_data=logging_extra)
         await handle_category(current_category_id=category_id, state=state,
                               category_message=callback.message, chat_id=None)
     except Exception as e:
-        logger.error("exception while trying to handle category click", extra=logging_extra, exc_info=e)
+        logger.error("exception while trying to handle category click", extra_data=logging_extra, exc_info=e)

@@ -1,6 +1,8 @@
 # part of it was made by donBarbos https://github.com/donBarbos/telegram-bot-template
 import asyncio
-import logging
+import structlog
+
+import structlog
 
 from init import bot, dp, app, reloader_service, news_repo
 from handlers import routers_list
@@ -11,7 +13,7 @@ from middlewares.prometheus import prometheus_middleware_factory
 from start_bot import start_bot
 from web.metrics import MetricsView
 
-logger = logging.getLogger('main')
+logger = structlog.get_logger('main')
 
 
 async def on_startup() -> None:

@@ -1,7 +1,7 @@
 # part of it was made by donBarbos https://github.com/donBarbos/telegram-bot-template
 import asyncio
 import datetime
-import logging
+import structlog
 
 from init import bot, app, news_service, create_dp
 from init_configs import bot_config
@@ -10,7 +10,7 @@ from start_bot import start_bot
 from utils import get_logging_extra
 from web.metrics import MetricsView
 
-logger = logging.getLogger("news_worker")
+logger = structlog.get_logger(name="news_worker")
 
 
 async def on_startup() -> None:
@@ -36,8 +36,8 @@ async def start():
 
     @light_dp.message()
     async def handler(message) -> None:
-        logging.critical("bot queries are routed to worker! "
-                         "check the webhook params, proxy configuration or docker port aliasing")
+        logger.critical("bot queries are routed to worker! "
+                        "check the webhook params, proxy configuration or docker port aliasing")
         await message.answer("критическая ошибка проксирования!")
 
     asyncio.create_task(start_bot(bot, light_dp, app, only_handled_updates=False))
@@ -48,9 +48,9 @@ async def start():
         logging_extra["message_id"] = str(message_id)
 
         _extra_with_message = logging_extra.copy()
-        _extra_with_message["message"] = str(message)
+        _extra_with_message["rabbitmq_message"] = str(message)
 
-        logger.debug("new message received", extra=_extra_with_message)
+        logger.debug("new message received", extra_data=_extra_with_message)
         try:
             telegram_id = message["telegram_id"]
             content = message["content"]
@@ -60,20 +60,20 @@ async def start():
             video = content["video"]
             animation = content["animation"]
             if not photo and not video and not animation:
-                logger.info("- recognized as pure text", extra=logging_extra)
+                logger.info("- recognized as pure text", extra_data=logging_extra)
                 await bot.send_message(telegram_id, text)
             elif photo:
-                logger.info("- recognized as photo", extra=logging_extra)
+                logger.info("- recognized as photo", extra_data=logging_extra)
                 await bot.send_photo(telegram_id, photo, caption=caption)
             elif video:
-                logger.info("- recognized as video", extra=logging_extra)
+                logger.info("- recognized as video", extra_data=logging_extra)
                 await bot.send_video(telegram_id, video, caption=caption)
             elif animation:
-                logger.info("- recognized as animation", extra=logging_extra)
+                logger.info("- recognized as animation", extra_data=logging_extra)
                 await bot.send_animation(telegram_id, animation)
-            logger.info("- message sent", extra=logging_extra)
+            logger.info("- message sent", extra_data=logging_extra)
         except Exception as e:
-            logger.error("- exception while processing message", extra=logging_extra, exc_info=e)
+            logger.error("- exception while processing message", extra_data=_extra_with_message, exc_info=e)
 
 
 if __name__ == "__main__":

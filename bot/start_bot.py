@@ -1,5 +1,5 @@
 import asyncio
-import logging
+import structlog
 
 from aiogram import Bot, Dispatcher
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
@@ -8,7 +8,7 @@ from aiohttp.web_runner import AppRunner, TCPSite
 
 from init_configs import bot_config
 
-logger = logging.getLogger("start_bot")
+logger = structlog.get_logger(name="start_bot")
 
 
 async def start_bot(bot: Bot, dp: Dispatcher, app: Application, only_handled_updates=True):
@@ -33,9 +33,9 @@ async def start_bot(bot: Bot, dp: Dispatcher, app: Application, only_handled_upd
                 logger.warning("webhook connection error, retrying")
                 await asyncio.sleep(2)
         if startup_exception:
-            logging.critical("webhook connection error", exc_info=startup_exception)
+            logger.error("webhook connection error", exc_info=startup_exception)
             raise startup_exception
-        logging.info("webhook connected", exc_info=startup_exception)
+        logger.info("webhook connected", exc_info=startup_exception)
         webhook_requests_handler = SimpleRequestHandler(
             dispatcher=dp,
             bot=bot,

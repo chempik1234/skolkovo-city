@@ -1,7 +1,7 @@
 # from email_validator import validate_email, EmailNotValidError
 # from email_validator import validate_email
 # from bot_functions.user import check_user_data
-import logging
+import structlog
 
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
@@ -14,7 +14,7 @@ from init_configs import BOT_ROOT_CATEGORY
 from translation import translate_string as _  # get_language_for_telegram_id
 from utils import get_logging_extra
 
-logger = logging.getLogger("handlers.user")
+logger = structlog.get_logger(name="handlers.user")
 
 router = Router()
 
@@ -74,22 +74,22 @@ async def choose_language_handler(callback: CallbackQuery, state: FSMContext):
     logging_extra = get_logging_extra(user_id)
     logging_extra["language"] = language
 
-    logger.info("user tries language", extra=logging_extra)
+    logger.info("user tries language", extra_data=logging_extra)
 
     try:
         await users_service.update_data(user_id, {"language": language})
     except Exception as e:
         logger.error("error while trying to update language",
-                      extra=logging_extra, exc_info=e)
+                      extra_data=logging_extra, exc_info=e)
 
     await state.set_state(States.default)
     await callback.answer(_("Язык изменён", language))
 
     try:
         logger.info("moving to /start after changing language",
-                     extra=logging_extra)
+                     extra_data=logging_extra)
         await handle_category(current_category_id=BOT_ROOT_CATEGORY, chat_id=callback.message.chat.id,
                               category_message=None, state=state)
     except Exception as e:
         logger.error("error while trying to /start after /language",
-                      extra=logging_extra, exc_info=e)
+                      extra_data=logging_extra, exc_info=e)
