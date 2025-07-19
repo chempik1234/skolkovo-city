@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
@@ -53,3 +55,5 @@ def create_dp() -> Dispatcher:
     return Dispatcher(storage=redis_conn_dp)
 
 dp = create_dp()
+
+logging.basicConfig(level=logging.INFO)

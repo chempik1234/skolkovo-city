@@ -33,8 +33,9 @@ async def start_bot(bot: Bot, dp: Dispatcher, app: Application, only_handled_upd
                 logger.warning("webhook connection error, retrying")
                 await asyncio.sleep(2)
         if startup_exception:
-            logging.critical("webhook connection", exc_info=startup_exception)
+            logging.critical("webhook connection error", exc_info=startup_exception)
             raise startup_exception
+        logging.info("webhook connected", exc_info=startup_exception)
         webhook_requests_handler = SimpleRequestHandler(
             dispatcher=dp,
             bot=bot,
@@ -45,11 +46,12 @@ async def start_bot(bot: Bot, dp: Dispatcher, app: Application, only_handled_upd
 
         runner = AppRunner(app)
         await runner.setup()
+
+        logger.info("trying to startup webhook bot...")
         site = TCPSite(runner, host=bot_config.BOT_WEBHOOK_HOST, port=bot_config.BOT_WEBHOOK_PORT)
         await site.start()
 
         logger.info("start bot successful: webhook")
-
         await asyncio.Event().wait()
     else:
         logger.info("starting bot polling")
