@@ -42,7 +42,8 @@ class RabbitMQMixin:
             await self.connection.close()
 
     async def publish(self, body: bytes, routing_key: str | None = None):
-        if self.exchange:
-            if routing_key is None:
-                routing_key = self.routing_key
-            await self.exchange.publish(Message(body=body), routing_key=routing_key)
+        if not self.exchange:
+            await self.connect()
+        if routing_key is None:
+            routing_key = self.routing_key
+        await self.exchange.publish(Message(body=body), routing_key=routing_key)

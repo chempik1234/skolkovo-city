@@ -27,5 +27,6 @@ class CategoryRepositoryPostgres(CategoryRepositoryBase):
                                                 title_ru=category.title_ru, title_en=category.title_en,
                                                 description_ru=category.description_ru,
                                                 description_en=category.description_en, link=category.link,
-                                                images_urls=category.images_urls, order_num=category.order_num,)
+                                                images_urls=category.images_urls, order_num=category.order_num,
+                                                videos_urls=category.videos_urls,)
         self.data = defaultdict(lambda: None, result)

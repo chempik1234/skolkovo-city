@@ -1,7 +1,8 @@
 import asyncio
 
+from aiogram.exceptions import TelegramNetworkError
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, InputMediaPhoto
+from aiogram.types import Message, InputMediaPhoto, InputMediaVideo, InputMedia, URLInputFile
 
 from config import States
 from init import bot, category_service
@@ -60,23 +61,43 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
     asyncio.create_task(delete_media_messages_from_state(state, send_to))
     await state.update_data({"media_messages": []})
 
-    send_images = isinstance(category, CategoryModel) and \
-                  isinstance(category.images_urls, list) and all(category.images_urls) and category.images_urls
-    if send_images:
-        photo_urls = category.images_urls
-        media_group = [
-            InputMediaPhoto(media=url)
-            for url in photo_urls[:10]
-        ]
+    if category is None:
+        send_media = False
+    else:
+        send_media = isinstance(category, CategoryModel) and \
+                     (isinstance(category.images_urls, list) and all(category.images_urls) and category.images_urls) or \
+                     (isinstance(category.videos_urls, list) and all(category.videos_urls) and category.videos_urls)
+
+    if send_media:
+        media_messages: list[Message] = []
+
+        media_group: list[InputMedia] = []
+        photo_urls = category.images_urls if category else None
+        video_urls = category.videos_urls if category else None
+        if photo_urls:
+            media_group.extend([
+                InputMediaPhoto(media=url)
+                for url in photo_urls[:10]
+            ])
+        if video_urls:
+            for url in video_urls:
+                try:
+                    video_message = await bot.send_video(send_to, URLInputFile(url, timeout=60))
+                    media_messages.append(video_message)
+                except TelegramNetworkError:
+                    message = await bot.send_message(send_to, f"Не удалось отправить видео, откройте по (ссылке)[{url}]",
+                                                     parse_mode="Markdown")
+                    media_messages.append(message)
+
         media_group[0].parse_mode = "Markdown"
-        messages: list[Message] = await bot.send_media_group(chat_id=send_to, media=media_group)
+        media_messages.extend(await bot.send_media_group(chat_id=send_to, media=media_group))
 
         # store messages ID so we can erase them later
-        messages_ids = [i.message_id for i in messages]
+        messages_ids = [i.message_id for i in media_messages]
         await state.update_data({"media_messages": messages_ids})
 
 
-    if send_images or category_message is None:
+    if send_media or category_message is None:
         await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode="Markdown")
     else:
         await category_message.edit_text(text=text, parse_mode="Markdown")

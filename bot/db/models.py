@@ -43,6 +43,10 @@ class CategoryDataModel(Base):
         sa.ARRAY(sa.Text),
         nullable=True
     )
+    videos_urls = sa.Column(
+        sa.ARRAY(sa.Text),
+        nullable=True
+    )
 
     parent_id = sa.Column(
         sa.ForeignKey("category.id", ondelete="CASCADE"),

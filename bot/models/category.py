@@ -11,6 +11,7 @@ class CategoryModel(BaseModel):
     order_num: int
 
     images_urls: list[str] | None
+    videos_urls: list[str] | None
 
     description_ru: str | None
     description_en: str | None
