@@ -78,6 +78,9 @@ class UserService:
     async def is_admin(self, telegram_id: int, no_cache_check=False) -> bool | None:
         return await self._get_object_field(telegram_id=telegram_id, no_cache_check=no_cache_check, field_name="is_admin")
 
+    async def get_language(self, telegram_id: int, no_cache_check=False) -> str | None:
+        return await self._get_object_field(telegram_id=telegram_id, no_cache_check=no_cache_check, field_name="language")
+
     async def _get_object_field(self, telegram_id: int, field_name: str, no_cache_check: bool = False) -> Any:
         result = None
         if not no_cache_check:

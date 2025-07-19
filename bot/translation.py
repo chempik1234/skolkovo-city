@@ -33,9 +33,8 @@ async def get_title_description_for_language(category: CategoryModel, language: 
 
 
 async def get_language_for_telegram_id(telegram_id: int | str):
-    # TODO: create a method to receive only language, not the whole model
-    user: UserModel | None = await users_service.get_object(telegram_id=telegram_id)
-    language = "ru" if user is None else user.language
+    language: str | None = await users_service.get_language(telegram_id=telegram_id)
+    language = "ru" if language is None else language
     return language
 
 
