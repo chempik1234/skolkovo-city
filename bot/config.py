@@ -47,6 +47,8 @@ class BotConfig(Config):
 
     BOT_USE_WEBHOOK: bool = Field("BOT_USE_WEBHOOK", caster=BoolCaster())
 
+    BOT_INSTANCE_NAME: str = Field("BOT_INSTANCE_NAME")
+
     @property
     def BOT_WEBHOOK_URL(self):
         return f"https://{self.BOT_WEBHOOK_BASE}{self.BOT_WEBHOOK_PATH}"

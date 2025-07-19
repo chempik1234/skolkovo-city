@@ -1,5 +1,3 @@
-import aio_pika
-import pika
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
