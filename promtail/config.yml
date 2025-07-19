@@ -1,0 +1,23 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+# scrape_configs:
+# - job_name: bots
+#   static_configs:
+#     - targets:
+#         - bot1:5000  # Явно указываем сервисы
+#         - bot2:5000
+#         - bot3:5000
+#         - worker:6000
+#       labels:
+#         job: bots
+#         env: production
+#         __scheme__: http
+#         __path__: /metrics

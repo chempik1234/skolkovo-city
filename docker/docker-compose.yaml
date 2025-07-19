@@ -1,3 +1,14 @@
+x-def-logging: &default-logging
+  logging:
+    driver: "loki"
+    options:
+      loki-url: "http://localhost:3100/loki/api/v1/push"
+      loki-batch-size: "100"
+      loki-retries: 2
+      loki-max-backoff: 1000ms
+      loki-timeout: 1s
+      labels: "service={{.Name}},instance={{.ID}}"
+
 x-bot-template: &bot-template
   build:
     dockerfile: ../docker/Dockerfile.bot
@@ -13,6 +24,7 @@ x-bot-template: &bot-template
     retries: 3
   networks:
     - bot-network
+  <<: *default-logging
 
 x-worker-template: &worker-template
   <<: *bot-template
@@ -51,10 +63,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    logging:
-      driver: loki
-      options:
-        loki-url: http://loki:3100/loki/api/v1/push
     ports:
       - "5001:5000"
     environment:
@@ -69,10 +77,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    logging:
-      driver: loki
-      options:
-        loki-url: http://loki:3100/loki/api/v1/push
     ports:
       - "5002:5000"
     environment:
@@ -87,10 +91,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    logging:
-      driver: loki
-      options:
-        loki-url: http://loki:3100/loki/api/v1/push
     ports:
       - "5003:5000"
     environment:
@@ -108,10 +108,6 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    logging:
-      driver: loki
-      options:
-        loki-url: http://loki:3100/loki/api/v1/push
     expose:
       - "6000"
     environment:
@@ -147,7 +143,7 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ../redis/redis.conf:/usr/local/etc/redis/redis.conf
     env_file:
       - ../config/.env
     command: /bin/sh -c "redis-server --requirepass $$REDIS_PASSWORD"
@@ -181,16 +177,15 @@ services:
     image: grafana/loki:latest
     ports:
       - "3100:3100"
-    #TODO: config with user and password
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - bot-network
-
-  promtail:
-    image: grafana/promtail:latest
+      - "9095:9095"
     volumes:
-      - /var/log:/var/log
-    command: -config.file=/etc/promtail/config.yml
+      - ../loki/loki-config.yml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3100/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - bot-network
 
