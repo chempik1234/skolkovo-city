@@ -7,6 +7,7 @@ from init import bot, app, news_service, create_dp
 from init_configs import bot_config
 from middlewares.prometheus import prometheus_middleware_factory
 from start_bot import start_bot
+from utils import get_logging_extra
 from web.metrics import MetricsView
 
 logger = logging.getLogger("news_worker")
@@ -42,7 +43,14 @@ async def start():
     asyncio.create_task(start_bot(bot, light_dp, app, only_handled_updates=False))
     async for message in news_service.read():
         message_id = datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")
-        logger.info("new message received", message, message_id)
+
+        logging_extra = get_logging_extra(None)
+        logging_extra["message_id"] = str(message_id)
+
+        _extra_with_message = logging_extra.copy()
+        _extra_with_message["message"] = str(message)
+
+        logger.debug("new message received", extra=_extra_with_message)
         try:
             telegram_id = message["telegram_id"]
             content = message["content"]
@@ -52,20 +60,20 @@ async def start():
             video = content["video"]
             animation = content["animation"]
             if not photo and not video and not animation:
-                logger.info("- recognized as pure text", message_id)
+                logger.info("- recognized as pure text", extra=logging_extra)
                 await bot.send_message(telegram_id, text)
             elif photo:
-                logger.info("- recognized as photo", message_id)
+                logger.info("- recognized as photo", extra=logging_extra)
                 await bot.send_photo(telegram_id, photo, caption=caption)
             elif video:
-                logger.info("- recognized as video", message_id)
+                logger.info("- recognized as video", extra=logging_extra)
                 await bot.send_video(telegram_id, video, caption=caption)
             elif animation:
-                logger.info("- recognized as animation", message_id)
+                logger.info("- recognized as animation", extra=logging_extra)
                 await bot.send_animation(telegram_id, animation)
-            logger.info("- message sent", message_id)
+            logger.info("- message sent", extra=logging_extra)
         except Exception as e:
-            logger.error("- exception while processing message", message_id, exc_info=e)
+            logger.error("- exception while processing message", extra=logging_extra, exc_info=e)
 
 
 if __name__ == "__main__":
