@@ -51,6 +51,10 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    logging:
+      driver: loki
+      options:
+        loki-url: http://loki:3100/loki/api/v1/push
     ports:
       - "5001:5000"
     environment:
@@ -65,6 +69,10 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    logging:
+      driver: loki
+      options:
+        loki-url: http://loki:3100/loki/api/v1/push
     ports:
       - "5002:5000"
     environment:
@@ -79,6 +87,10 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    logging:
+      driver: loki
+      options:
+        loki-url: http://loki:3100/loki/api/v1/push
     ports:
       - "5003:5000"
     environment:
@@ -96,6 +108,10 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    logging:
+      driver: loki
+      options:
+        loki-url: http://loki:3100/loki/api/v1/push
     expose:
       - "6000"
     environment:
@@ -160,7 +176,25 @@ services:
     networks:
       - bot-network
 
-  #region monitoring made by donBarbos https://github.com/donBarbos/telegram-bot-template
+  #region monitoring
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    #TODO: config with user and password
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - bot-network
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/log:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - bot-network
+
+  # made by donBarbos https://github.com/donBarbos/telegram-bot-template
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter

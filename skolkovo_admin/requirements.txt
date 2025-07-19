@@ -39,7 +39,6 @@ psycopg2-binary==2.9.10
 pydantic==2.11.7
 pydantic_core==2.33.2
 python-dotenv==1.1.1
-python-logging-loki==0.3.1
 redis==6.2.0
 requests==2.32.4
 rfc3339==6.2
