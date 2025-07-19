@@ -89,8 +89,9 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
                                                      parse_mode="Markdown")
                     media_messages.append(message)
 
-        media_group[0].parse_mode = "Markdown"
-        media_messages.extend(await bot.send_media_group(chat_id=send_to, media=media_group))
+        if media_group:
+            media_group[0].parse_mode = "Markdown"
+            media_messages.extend(await bot.send_media_group(chat_id=send_to, media=media_group))
 
         # store messages ID so we can erase them later
         messages_ids = [i.message_id for i in media_messages]
