@@ -13,3 +13,6 @@ deldb:
 freeze:
 	 pip freeze > .\bot\requirements.txt
 	 pip freeze > .\skolkovo_admin\requirements.txt
+
+mig:
+	python .\skolkovo_admin\manage.py makemigrations

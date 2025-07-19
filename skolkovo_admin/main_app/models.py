@@ -32,6 +32,14 @@ class Category(models.Model):
         help_text="Список URL изображений",
         verbose_name="Ссылки на изображения (ЧЕРЕЗ ЗАПЯТУЮ)"
     )
+    videos_urls = ArrayField(
+        models.TextField(blank=True),
+        blank=True,
+        null=True,
+        default=list,
+        help_text="Список URL видео",
+        verbose_name="Ссылки на видео (ЧЕРЕЗ ЗАПЯТУЮ)"
+    )
 
     def save(self, *args, **kwargs):
         # order num is current max in group + 1 by default
@@ -72,3 +80,11 @@ class TelegramUser(models.Model):
         db_table = 'user'
         verbose_name = 'Telegram пользователь'
         verbose_name_plural = 'Telegram пользователи'
+
+
+class Video(models.Model):
+    title = models.CharField(max_length=100, null=False, blank=False)
+    file = models.FileField(upload_to='videos/%Y/%m/%d')
+
+    def file_url(self):
+        return self.file.url

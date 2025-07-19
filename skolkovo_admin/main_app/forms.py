@@ -3,7 +3,7 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 
-class ImageArrayWidget(forms.Textarea):
+class UrlsArrayWidget(forms.Textarea):
     def render(self, name, value, attrs=None, renderer=None):
         if not value:
             value = ""

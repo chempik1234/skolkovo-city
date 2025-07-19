@@ -25,8 +25,8 @@ services:
       dockerfile: ../docker/Dockerfile.admin
     ports:
       - "8080:8080"
-    # volumes:
-    #   - media-data:/app/media
+    volumes:
+      - media-data:/app/media
     depends_on:
       db:
         condition: service_healthy
@@ -226,14 +226,21 @@ services:
     volumes:
       - ../nginx/conf.d:/etc/nginx/conf.d
       - ../nginx/ssl:/etc/nginx/ssl
+      - media-data:/home/app/admin/media
     networks:
       - bot-network
+    depends_on:
+      - bot1
+      - bot2
+      - bot3
+      - admin
 
 networks:
   bot-network:
     driver: bridge
 
 volumes:
+  media-data:
   postgres_data:
   redis-data:
   prometheus-data:

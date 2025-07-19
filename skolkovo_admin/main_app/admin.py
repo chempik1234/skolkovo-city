@@ -7,8 +7,8 @@ from django.utils.html import format_html, escape
 from django import forms
 from django.utils.safestring import mark_safe
 
-from .forms import ImageArrayWidget
-from .models import Category, TelegramUser
+from .forms import UrlsArrayWidget
+from .models import Category, TelegramUser, Video
 
 
 class CategoryAdminForm(forms.ModelForm):
@@ -16,7 +16,8 @@ class CategoryAdminForm(forms.ModelForm):
         model = Category
         fields = '__all__'
         widgets = {
-            'images_urls': ImageArrayWidget(),
+            'images_urls': UrlsArrayWidget(),
+            'videos_urls': UrlsArrayWidget(),
         }
 
 
@@ -24,7 +25,8 @@ class CategoryInline(admin.TabularInline):  # admin.StackedInline
     model = Category
     fk_name = 'parent'
     extra = 1
-    fields = ('order_num', 'title_ru', 'title_en', 'description_ru', 'description_en', 'link', 'images_urls')
+    fields = ('order_num', 'title_ru', 'title_en', 'description_ru', 'description_en', 'link',
+              'images_urls', 'videos_urls',)
     show_change_link = True
 
 
@@ -39,7 +41,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields['images_urls'].widget = ImageArrayWidget()
+        form.base_fields['images_urls'].widget = UrlsArrayWidget()
+        form.base_fields['videos_urls'].widget = UrlsArrayWidget()
         return form
 
     def parent_link(self, obj):
@@ -87,3 +90,9 @@ class TelegramUserAdmin(admin.ModelAdmin):
     list_filter = ('is_admin', 'is_banned')
     search_fields = ('telegram_id',)
     actions = (ban_users, ban_users_reverse,)
+
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ("title", "file_url",)
+    search_fields = ('title',)
