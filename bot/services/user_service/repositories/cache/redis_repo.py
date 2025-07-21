@@ -58,11 +58,15 @@ class UserCacheRepositoryRedis(UserCacheRepositoryBase):
         self.redis.set(f"{user.telegram_id}__{field_name}", value, ex=self.expire_seconds)
 
     def get_object_field(self, telegram_id, field_name: str) -> Any:
-        result = self.redis.get(f"{telegram_id}__{field_name}")
+        result: bytes | None = self.redis.get(f"{telegram_id}__{field_name}")
         if result is None:
             return None
-        if UserDataModel.__annotations__.get(field_name, None) is Mapped[bool]:
+
+        field_type = UserDataModel.__annotations__.get(field_name, None)
+        if field_type is Mapped[bool]:
             result = True if int(result) == 1 else False
+        elif field_type is Mapped[str]:
+            result = result.decode("utf8")
         return result
 
     def get_objects_field(self, field_name: str) -> list[Any] | None:
