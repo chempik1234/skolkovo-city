@@ -1,6 +1,35 @@
+import csv
+import os
+from collections import defaultdict
+
 from init import users_service
+from init_configs import bot_config
 from models.category import CategoryModel
-from models.user import UserModel
+
+
+def load_translations(filepath) -> dict:
+    """
+    get all possible translation combinations
+
+    ru,en,sp
+    word1,word2,word3
+
+    word1: {en: word2, sp: word3}
+    word2: {ru: word1, sp: word3}
+    word3: {ru: word1, en: word2}
+    """
+    result = defaultdict(lambda: defaultdict(lambda: "???", {}), {})
+    with open(filepath, "r") as file:
+        csvreader = csv.reader(file.readlines(), delimiter=",")
+
+        languages = []
+        for row in csvreader:
+            if not languages:
+                languages = row.copy()
+                continue
+            for ind, word in enumerate(row):
+                result[word] = defaultdict(lambda: "???", {lang: word for lang, word in zip(languages[: ind]+languages[ind+1:], row[: ind]+row[ind+1:])})
+    return result
 
 
 async def get_description_for_chat_id(category: CategoryModel, telegram_id: int | str):
@@ -39,5 +68,7 @@ async def get_language_for_telegram_id(telegram_id: int | str):
 
 
 def translate_string(string: str, language: str):
-    # TODO: make i18n from scratch
-    return string
+    return TRANSLATIONS[string][language]
+
+
+TRANSLATIONS = load_translations(os.path.join(bot_config.CONFIG_MOUNT_DIR, "translation.csv"))

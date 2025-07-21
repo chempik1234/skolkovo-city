@@ -4,6 +4,7 @@ from init import category_service
 from init_configs import BOT_ROOT_CATEGORY
 from models.category import CategoryModel
 from utils import get_title_for_language as _t
+from translation import translate_string as _
 
 
 async def category_keyboard(category: CategoryModel | None, language: str = "ru") -> InlineKeyboardMarkup:
@@ -30,11 +31,11 @@ async def category_keyboard(category: CategoryModel | None, language: str = "ru"
         keyboard.append(
             [
                 InlineKeyboardButton(
-                    text='Назад',
+                    text=_('Назад', language),
                     callback_data=f'category_{parent_id}',
                 ),
                 InlineKeyboardButton(
-                    text='Главное меню',
+                    text=_('Главное меню', language),
                     callback_data=f'category_{BOT_ROOT_CATEGORY}',
                 ),
             ],

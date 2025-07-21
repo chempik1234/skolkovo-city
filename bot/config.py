@@ -14,6 +14,8 @@ class BotConfig(Config):
     API_TOKEN: str = Field("API_TOKEN")
     WEBHOOK_SECRET: str = Field("WEBHOOK_SECRET", default="1234")
 
+    CONFIG_MOUNT_DIR: str = Field("CONFIG_MOUNT_DIR", default="/etc/app")
+
     RABBITMQ_HOST: str = Field("RABBITMQ_HOST", default="localhost")
     RABBITMQ_PORT: str = Field("RABBITMQ_PORT", default="5672")
     RABBITMQ_VIRTUAL_HOST: str = Field("RABBITMQ_VIRTUAL_HOST", default="/")
