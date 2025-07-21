@@ -1,6 +1,17 @@
+import os
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import TextField
+
+
+def file_path_fabric(folder_name: str):
+    def get_file_path(instance, filename):
+        ext = filename.split('.')[-1]
+        new_filename = '{}.{}'.format(instance.id, ext)
+        return os.path.join(folder_name, new_filename)
+
+    return get_file_path
 
 
 class Category(models.Model):
@@ -84,7 +95,19 @@ class TelegramUser(models.Model):
 
 class Video(models.Model):
     title = models.CharField(max_length=100, null=False, blank=False)
-    file = models.FileField(upload_to='videos/%Y/%m/%d')
+    file = models.FileField(upload_to=file_path_fabric("videos"))
 
     def file_url(self):
         return self.file.url
+
+    def rename_file(self):
+        ext = self.file.name.split('.')[-1]
+        new_name = f"{self.id}.{ext}"
+
+        old_path = self.file.path
+        new_path = os.path.join('videos', new_name)
+
+        os.makedirs(os.path.dirname(new_path), exist_ok=True)
+        os.rename(old_path, new_path)
+
+        self.file.name = new_name
