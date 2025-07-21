@@ -1,53 +1,134 @@
 {
-  "title": "Telegram Bot Metrics",
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "expr": "sum(rate(tgbot_exceptions_total[1m])) by (exception_type) > 0",
+        "name": "Errors",
+        "tags": [
+          "error"
+        ],
+        "title": "Exception: {{exception_type}}"
+      }
+    ]
+  },
   "description": "Comprehensive monitoring for Telegram bot",
-  "tags": [
-    "telegram",
-    "bot",
-    "monitoring"
-  ],
-  "timezone": "browser",
   "editable": true,
-  "refresh": "30s",
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "iteration": 1753090691755,
+  "links": [],
+  "liveNow": false,
   "panels": [
     {
-      "title": "Category Clicks Distribution",
-      "type": "barchart",
-      "gridPos": {
-        "x": 0,
-        "y": 30,
-        "w": 24,
-        "h": 10
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
-      "datasource": "Prometheus",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "alertThreshold": true,
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom"
+        }
+      },
+      "percentage": false,
+      "pluginVersion": "8.5.22",
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
       "targets": [
         {
-          "expr": "topk(20, sum by(button_text) (rate(tgbot_category_clicks_total[1y]))",
-          "legendFormat": "{{button_text}}",
-          "refId": "A",
-          "instant": true
+          "expr": "rate(tgbot_requests_total[1m])",
+          "legendFormat": "{{method}} {{path_template}}",
+          "refId": "A"
         }
       ],
-      "options": {
-        "barWidth": 0.9,
-        "xAxis": {
+      "thresholds": [],
+      "timeRegions": [],
+      "title": "Requests Rate",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "mode": "time",
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
           "show": true
         },
-        "yAxis": {
-          "show": true,
-          "align": true
-        },
-        "legend": {
-          "show": true,
-          "placement": "right",
-          "values": [
-            "total"
-          ]
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "desc"
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
         }
+      ],
+      "yaxis": {
+        "align": false
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
       "fieldConfig": {
         "defaults": {
@@ -55,33 +136,59 @@
             "mode": "palette-classic"
           },
           "custom": {
-            "axisCenteredZero": false,
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 80,
-            "gradientMode": "none",
             "hideFrom": {
               "legend": false,
               "tooltip": false,
               "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
             }
           },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "pieType": "pie",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by(status_code) (rate(tgbot_responses_total[1m]))",
+          "legendFormat": "{{status_code}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Response Status Codes",
+      "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -95,48 +202,440 @@
               }
             ]
           }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.22",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(tgbot_request_duration_seconds_bucket[1m])) by (le))",
+          "format": "s",
+          "refId": "A"
         }
-      }
+      ],
+      "title": "Request Duration (99th percentile)",
+      "type": "stat"
     },
     {
-      "title": "Category Clicks Proportion",
-      "type": "piechart",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
       "gridPos": {
-        "x": 0,
-        "y": 40,
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 8
+      },
+      "id": 7,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.5.22",
+      "targets": [
+        {
+          "expr": "sum(tgbot_requests_in_progress)",
+          "refId": "A"
+        }
+      ],
+      "title": "Requests in Progress",
+      "type": "gauge"
+    },
+    {
+      "columns": [
+        {
+          "text": "Endpoint",
+          "value": "path_template"
+        },
+        {
+          "text": "Latency (95%)",
+          "unit": "s",
+          "value": "Value"
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
         "w": 12,
-        "h": 10
+        "x": 12,
+        "y": 8
+      },
+      "id": 9,
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.5.22",
+      "targets": [
+        {
+          "expr": "topk(5, histogram_quantile(0.95, sum by(path_template) (rate(tgbot_request_duration_seconds_bucket[1m]))))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Top Slow Endpoints",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "id": 8,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
       },
       "targets": [
         {
-          "expr": "topk(10, sum by(button_text) (tgbot_category_clicks_total))",
+          "expr": "sum by(exception_type) (rate(tgbot_exceptions_total[1m]))",
+          "legendFormat": "{{exception_type}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Exceptions by Type",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 1,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.9,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "right",
+          "show": true,
+          "values": [
+            "total"
+          ]
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "desc"
+        },
+        "xAxis": {
+          "show": true
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0,
+        "yAxis": {
+          "align": true,
+          "show": true
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(20, sum by(button_text) (rate(tgbot_category_clicks_total[1y]))",
+          "instant": true,
           "legendFormat": "{{button_text}}",
           "refId": "A"
         }
       ],
-      "options": {
-        "pieType": "pie",
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
-        "legend": {
-          "values": [
-            "percent"
-          ],
-          "placement": "right"
-        }
-      }
+      "title": "Category Clicks Distribution",
+      "type": "barchart"
     },
     {
-      "title": "Last Activity by Category",
-      "type": "table",
-      "gridPos": {
-        "x": 12,
-        "y": 40,
-        "w": 12,
-        "h": 10
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
       },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 0,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      },
+      "id": 2,
+      "options": {
+        "displayMode": "gradient",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "text": {}
+      },
+      "pluginVersion": "8.5.22",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by(button_text) (tgbot_category_clicks_total)",
+          "legendFormat": "{{button_text}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Category Clicks Proportion",
+      "type": "bargauge"
+    },
+    {
+      "columns": [
+        {
+          "text": "Category",
+          "value": "button_text"
+        },
+        {
+          "text": "Last Click",
+          "type": "time",
+          "unit": "fromNow",
+          "value": "Value"
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      },
+      "id": 3,
+      "showHeader": true,
+      "sort": {
+        "col": 0,
+        "desc": true
+      },
+      "styles": [
+        {
+          "alias": "Time Since Last Click",
+          "align": "auto",
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "pattern": "Value",
+          "type": "date"
+        }
+      ],
       "targets": [
         {
           "expr": "tgbot_category_last_click_timestamp",
@@ -145,173 +644,59 @@
           "refId": "A"
         }
       ],
-      "columns": [
-        {
-          "text": "Category",
-          "value": "button_text"
-        },
-        {
-          "text": "Last Click",
-          "value": "Value",
-          "type": "time",
-          "unit": "fromNow"
-        }
-      ],
-      "styles": [
-        {
-          "alias": "Time Since Last Click",
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "pattern": "Value",
-          "type": "date"
-        }
-      ]
-    },
-    {
-      "title": "Requests Rate",
-      "type": "graph",
-      "gridPos": {
-        "x": 0,
-        "y": 0,
-        "w": 12,
-        "h": 8
-      },
-      "targets": [
-        {
-          "expr": "rate(tgbot_requests_total[1m])",
-          "legendFormat": "{{method}} {{path_template}}",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom"
-        }
-      }
-    },
-    {
-      "title": "Response Status Codes",
-      "type": "piechart",
-      "gridPos": {
-        "x": 12,
-        "y": 0,
-        "w": 12,
-        "h": 8
-      },
-      "targets": [
-        {
-          "expr": "sum by(status_code) (rate(tgbot_responses_total[1m]))",
-          "legendFormat": "{{status_code}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "title": "Request Duration (99th percentile)",
-      "type": "stat",
-      "gridPos": {
-        "x": 0,
-        "y": 8,
-        "w": 6,
-        "h": 6
-      },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.99, sum(rate(tgbot_request_duration_seconds_bucket[1m])) by (le))",
-          "format": "s",
-          "refId": "A"
-        }
-      ],
-      "options": {
-        "colorMode": "value",
-        "graphMode": "area",
-        "justifyMode": "auto"
-      }
-    },
-    {
-      "title": "Requests in Progress",
-      "type": "gauge",
-      "gridPos": {
-        "x": 6,
-        "y": 8,
-        "w": 6,
-        "h": 6
-      },
-      "targets": [
-        {
-          "expr": "sum(tgbot_requests_in_progress)",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "title": "Exceptions by Type",
-      "type": "barchart",
-      "gridPos": {
-        "x": 0,
-        "y": 14,
-        "w": 12,
-        "h": 8
-      },
-      "targets": [
-        {
-          "expr": "sum by(exception_type) (rate(tgbot_exceptions_total[1m]))",
-          "legendFormat": "{{exception_type}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "title": "Top Slow Endpoints",
-      "type": "table",
-      "gridPos": {
-        "x": 12,
-        "y": 8,
-        "w": 12,
-        "h": 14
-      },
-      "targets": [
-        {
-          "expr": "topk(5, histogram_quantile(0.95, sum by(path_template) (rate(tgbot_request_duration_seconds_bucket[1m]))))",
-          "instant": true,
-          "refId": "A",
-          "format": "table"
-        }
-      ],
-      "columns": [
-        {
-          "text": "Endpoint",
-          "value": "path_template"
-        },
-        {
-          "text": "Latency (95%)",
-          "value": "Value",
-          "unit": "s"
-        }
-      ]
+      "title": "Last Activity by Category",
+      "transform": "timeseries_to_columns",
+      "type": "table-old"
     }
+  ],
+  "refresh": "",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [
+    "telegram",
+    "bot",
+    "monitoring"
   ],
   "templating": {
     "list": [
       {
-        "name": "path",
+        "allFormat": "glob",
+        "current": {
+          "selected": false,
+          "text": "/metrics",
+          "value": "/metrics"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "PBFA97CFB590B2093"
+        },
+        "definition": "",
+        "hide": 0,
+        "includeAll": false,
         "label": "Path",
-        "type": "query",
-        "query": "label_values(tgbot_requests_total, path_template)"
+        "multi": false,
+        "name": "path",
+        "options": [],
+        "query": {
+          "query": "label_values(tgbot_requests_total, path_template)",
+          "refId": "Prometheus-path-Variable-Query"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
       }
     ]
   },
-  "annotations": {
-    "list": [
-      {
-        "name": "Errors",
-        "datasource": "Prometheus",
-        "expr": "sum(rate(tgbot_exceptions_total[1m])) by (exception_type) > 0",
-        "title": "Exception: {{exception_type}}",
-        "tags": [
-          "error"
-        ]
-      }
-    ]
-  }
+  "time": {
+    "from": "2025-07-13T19:00:00.000Z",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Telegram Bot Metrics",
+  "uid": "9i6N9a8Nz",
+  "version": 1,
+  "weekStart": ""
 }
