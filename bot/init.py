@@ -2,6 +2,7 @@ import structlog
 
 import structlog
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.fsm.storage.redis import RedisStorage
 from aiohttp import web
 
@@ -48,7 +49,7 @@ reloader_service = ReloaderService(reloader_repo, category_service.reload_catego
 news_repo = NewsSenderRepositoryRabbitMQ(rabbitmq_url, "news")
 news_service = NewsSenderService(news_repo)
 
-bot = Bot(token=bot_config.API_TOKEN)
+bot = Bot(token=bot_config.API_TOKEN, default=DefaultBotProperties(parse_mode='Markdown'))
 app = web.Application()
 
 

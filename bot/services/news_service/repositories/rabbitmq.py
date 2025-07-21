@@ -6,6 +6,7 @@ from aio_pika import ExchangeType
 from aio_pika.abc import AbstractIncomingMessage
 
 from services.news_service.repositories.base import NewsSenderRepositoryBase
+from services.news_service.types import NewsContentMessage
 from services.rabbitmq_mixin import RabbitMQMixin
 
 
@@ -20,11 +21,11 @@ class NewsSenderRepositoryRabbitMQ(NewsSenderRepositoryBase, RabbitMQMixin):
                 body=body.encode('utf-8'),
             ))
 
-    def get_message_data(self, message: AbstractIncomingMessage) -> dict[str, int | dict[str, Any]]:
+    def get_message_data(self, message: AbstractIncomingMessage) -> NewsContentMessage:
         queue_message = json.loads(message.body.decode('utf-8'))
         return queue_message
 
-    async def read(self) -> AsyncGenerator[dict[str, int | dict[str, Any]], None]:
+    async def read(self) -> AsyncGenerator[NewsContentMessage, None]:
         await self.connect()
         async with self.queue.iterator() as queue_iterator:
             async for message in queue_iterator:

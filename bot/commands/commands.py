@@ -10,7 +10,7 @@ from aiogram.types import Message
 
 from bot_functions.category import handle_category
 from bot_functions.settings import make_user_choose_language
-from config import NewsForm
+from config import NewsForm, States
 from init import category_service, users_service, reloader_service
 from init_configs import BOT_ROOT_CATEGORY
 from utils import get_logging_extra
@@ -27,6 +27,7 @@ async def command_start(message: Message, state: FSMContext):
         logger.info("/start command", extra_data=logging_extra)
         await handle_category(current_category_id=BOT_ROOT_CATEGORY, chat_id=message.chat.id,
                               category_message=None, state=state)
+        await state.set_state(States.default)
     except Exception as e:
         logger.error("error while trying to /start", extra_data=logging_extra, exc_info=e)
 
