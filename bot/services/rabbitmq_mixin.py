@@ -23,7 +23,7 @@ class RabbitMQMixin:
     async def connect(self):
         if self.connection:
             return
-        self.connection = await aio_pika.connect(self.url)
+        self.connection = await aio_pika.connect_robust(self.url)
         self.channel = await self.connection.channel()
 
         if not self.exchange:

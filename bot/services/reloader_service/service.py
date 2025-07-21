@@ -1,8 +1,12 @@
 import asyncio
 from typing import Callable, Any
 
+import structlog
+
 from services.category_service.repositories.base import CategoryRepositoryBase
 from services.reloader_service.repositories.base import ReloaderRepositoryBase
+
+logger = structlog.get_logger("reloader_service")
 
 
 class ReloaderService:
