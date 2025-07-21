@@ -41,7 +41,10 @@ class UserCacheRepositoryRedis(UserCacheRepositoryBase):
         return self._deserialize(data)
 
     def invalidate_object(self, telegram_id: int | str) -> None:
-        self.redis.delete(str(telegram_id))
+        key = str(telegram_id)
+        self.redis.delete(key)
+        for field_key in self.redis.scan_iter(f"{key}__*"):
+            self.redis.delete(field_key)
 
     def cache_object(self, user: UserDataModel) -> None:
         self.redis.set(str(user.telegram_id), self._serialize(user), ex=self.expire_seconds)
