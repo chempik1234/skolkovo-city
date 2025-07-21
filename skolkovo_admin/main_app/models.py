@@ -1,6 +1,8 @@
 import os
 
 from django.contrib.postgres.fields import ArrayField
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.db import models
 from django.db.models import TextField
 
@@ -104,10 +106,8 @@ class Video(models.Model):
         ext = self.file.name.split('.')[-1]
         new_name = f"{self.id}.{ext}"
 
-        old_path = self.file.path
-        new_path = os.path.join('videos', new_name)
-
-        os.makedirs(os.path.dirname(new_path), exist_ok=True)
-        os.rename(old_path, new_path)
+        if default_storage.exists(self.file.name):
+            default_storage.save(new_name, ContentFile(self.file.read()))
+            default_storage.delete(self.file.name)
 
         self.file.name = new_name

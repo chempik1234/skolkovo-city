@@ -23,8 +23,9 @@ def delete_old_file(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Video)
 def rename_uploaded_file(sender, instance, created, **kwargs):
-    instance.rename_file()
-    instance.save()
+    if created and instance.file:
+        instance.rename_file()
+        instance.save()
 
 
 @receiver(post_delete, sender=Video)
