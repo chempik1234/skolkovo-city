@@ -14,3 +14,7 @@ def get_logging_extra(user_id: Any) -> dict:
     if user_id is not None:
         result["user_id"] = user_id
     return result
+
+
+def get_seconds_till_next_weather() -> int:
+    return 1

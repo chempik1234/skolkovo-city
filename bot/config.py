@@ -51,6 +51,11 @@ class BotConfig(Config):
 
     BOT_INSTANCE_NAME: str = Field("BOT_INSTANCE_NAME")
 
+    OPENWEATHERMAP_URL: str = Field("OPENWEATHERMAP_URL")
+    OPENWEATHERMAP_LAT: str = Field("OPENWEATHERMAP_LAT")
+    OPENWEATHERMAP_LON: str = Field("OPENWEATHERMAP_LON")
+    OPENWEATHERMAP_API_KEY: str = Field("OPENWEATHERMAP_API_KEY")
+
     @property
     def BOT_WEBHOOK_URL(self):
         return f"https://{self.BOT_WEBHOOK_BASE}{self.BOT_WEBHOOK_PATH}"
