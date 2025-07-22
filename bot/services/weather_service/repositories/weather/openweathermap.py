@@ -26,7 +26,7 @@ class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
 
         # Форматируем текст
         weather_text = (
-            f"{_("Погода", language)}: ({datetime.today().strftime("%d:%M:%y")})\n"
+            f"{_("Погода", language)}: ({datetime.today().strftime("%d:%m:%Y")})\n"
             f"🌡 {_("Температура", language)}: *{temp:.1f}°C ({_("ощущается как", language)} {feels_like:.1f}°C)*\n"
             f"☁️ {_("Состояние", language)}: *{description}*\n"
             f"💧 {_("Влажность", language)}: *{humidity}%*\n"
