@@ -13,6 +13,9 @@ class QuestionLookupRepositoryBase:
     async def get_similarity(self, db_embedding: np.ndarray, new_question: str) -> Any:
         new_embedding = await self.get_embedding(new_question)
 
+        if new_embedding.shape != db_embedding.shape:
+            raise ValueError("Different shapes of embeddings")
+
         return (np.dot(new_embedding, db_embedding) /
                 (np.linalg.norm(new_embedding) * np.linalg.norm(db_embedding)))
 

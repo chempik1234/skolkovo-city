@@ -29,13 +29,13 @@ class AiChatService:
         accepts a question and returns related question and answer from storage, recalculates embeddings when NULL
         """
         async def process_question(question):
-            # cache embedding locally e.g. Postgres
+            # get embedding from remote API
             if not question.embedding:
                 logger.info("new embedding for question", extra_data={"question_id": question.id})
 
                 embedding = await self.question_lookup_repo.get_embedding(question.question)
                 await self.questions_storage_repo.set_embedding(question, embedding)
-            # or get from cache
+            # or get from cache e.g. Postgres
             else:
                 embedding = embedding_from_bytes(question.embedding)
 
@@ -52,11 +52,12 @@ class AiChatService:
         )
 
         # max_value, related_question = max([i for i in similarities if isinstance(i, tuple)])
-        max_value = related_question = answer = None
+        max_value = None
+        related_question = answer = ""
         for result in similarities:
             if not isinstance(result, tuple):
                 continue
             if max_value is None or max_value is not None and max_value < result[0]:
-                max_value, related_question = answer = result
+                max_value, related_question, answer = result
 
-        return related_question
+        return related_question, answer
