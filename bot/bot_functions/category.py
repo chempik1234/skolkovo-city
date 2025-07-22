@@ -4,6 +4,7 @@ from aiogram.exceptions import TelegramNetworkError
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InputMediaPhoto, InputMedia, URLInputFile
 
+from bot_functions.ai_chat import begin_ai_chat
 from init import bot, category_service, weather_service
 from init.init_0 import bot_config
 from keyboards import category_keyboard
@@ -106,7 +107,6 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         messages_ids = [i.message_id for i in media_messages]
         await state.update_data({"media_messages": messages_ids})
 
-
     if send_media or category_message is None:
         await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode="Markdown")
     else:
@@ -118,7 +118,7 @@ async def handle_category(current_category_id, chat_id: int | str | None, catego
     """
     what if user clicked on a category button?
 
-    move in it, or send category.description, etc
+    move in it, or send category.description, or call AI, etc
 
     calls ``move_in_category``, ``send_category``
     :param chat_id: send to chat id (not needed if category_message is not None)
@@ -138,5 +138,13 @@ async def handle_category(current_category_id, chat_id: int | str | None, catego
             parent_title = parent_category.title_ru if parent_category is not None else "None"
             category_title = category.title_ru
         asyncio.create_task(track_category_click_async(f"{category_title} ({parent_title})"))
+
+    if isinstance(category, CategoryModel):
+        if "AI" in category.title_ru:
+            await begin_ai_chat(
+                chat_id=chat_id if chat_id else (category_message.chat.id if category_message else None),
+                state=state,
+            )
+            return
 
     await send_category(category_message, chat_id, category, state)

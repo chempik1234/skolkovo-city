@@ -56,6 +56,11 @@ class BotConfig(Config):
     OPENWEATHERMAP_LON: str = Field("OPENWEATHERMAP_LON")
     OPENWEATHERMAP_API_KEY: str = Field("OPENWEATHERMAP_API_KEY")
 
+    OPENAI_KEY: str = Field("OPENAI_KEY")
+
+    YANDEX_CLOUD_FOLDER: str = Field("YANDEX_CLOUD_FOLDER")
+    YANDEX_CLOUD_API_KEY: str = Field("YANDEX_CLOUD_API_KEY")
+
     @property
     def BOT_WEBHOOK_URL(self):
         return f"https://{self.BOT_WEBHOOK_BASE}{self.BOT_WEBHOOK_PATH}"
@@ -67,6 +72,7 @@ class BotConfig(Config):
 class States(StatesGroup):
     default = State()
     category = State()
+    ai_chat = State()
 
 
 class NewsForm(StatesGroup):

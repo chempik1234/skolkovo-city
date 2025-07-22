@@ -4,6 +4,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiohttp import web
 
 from .init_1 import redis_conn_users, postgres_conn, redis_conn_dp, users_service
+from .ai_chat_service import ai_chat_service
 from .init_0 import bot_config, rabbitmq_url
 from services.category_service.repositories.postgres import CategoryRepositoryPostgres
 from services.category_service.service import CategoryService
@@ -40,6 +41,7 @@ app = web.Application()
 
 def create_dp() -> Dispatcher:
     return Dispatcher(storage=redis_conn_dp)
+
 
 dp = create_dp()
 

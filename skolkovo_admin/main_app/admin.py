@@ -8,7 +8,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 
 from .forms import UrlsArrayWidget
-from .models import Category, TelegramUser, Video
+from .models import Category, TelegramUser, Video, Question
 
 
 class CategoryAdminForm(forms.ModelForm):
@@ -96,3 +96,11 @@ class TelegramUserAdmin(admin.ModelAdmin):
 class VideoAdmin(admin.ModelAdmin):
     list_display = ("title", "file_url",)
     search_fields = ('title',)
+
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ("question",)
+    list_filter = (
+        ("answer", admin.EmptyFieldListFilter),
+    )

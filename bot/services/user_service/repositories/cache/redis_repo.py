@@ -59,9 +59,9 @@ class UserCacheRepositoryRedis(UserCacheRepositoryBase, RedisMixin):
             return None
 
         field_type = UserDataModel.__annotations__.get(field_name, None)
-        if field_type is Mapped[bool]:
+        if field_type == Mapped[bool]:
             result = True if int(result) == 1 else False
-        elif field_type is Mapped[str]:
+        elif field_type == Mapped[str]:
             result = result.decode("utf8")
         return result
 

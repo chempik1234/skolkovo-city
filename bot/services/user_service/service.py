@@ -85,7 +85,6 @@ class UserService:
         result = None
         if not no_cache_check:
             result = self.user_cache_repo.get_object_field(telegram_id, field_name)
-
         if result is None:
             user = await self._get_object(telegram_id=telegram_id, no_cache_check=no_cache_check)
             if user is None:

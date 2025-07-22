@@ -56,6 +56,11 @@ async def start():
         logger.critical("bot queries are routed to worker! "
                         "check the webhook params, proxy configuration or docker port aliasing")
         await message.answer("критическая ошибка проксирования!")
+    @light_dp.callback_query()
+    async def handler(callback) -> None:
+        logger.critical("bot queries are routed to worker! "
+                        "check the webhook params, proxy configuration or docker port aliasing")
+        await bot.send_message(callback.message.chat.id, "критическая ошибка проксирования!")
 
     asyncio.create_task(start_bot(bot, light_dp, app, only_handled_updates=False))
     async for message in news_service.read():

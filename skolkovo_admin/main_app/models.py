@@ -111,3 +111,12 @@ class Video(models.Model):
             default_storage.delete(self.file.name)
 
         self.file.name = new_name
+
+
+class Question(models.Model):
+    question = models.TextField(null=False, blank=False)
+    answer = models.TextField(null=True, blank=True)
+    embedding = models.BinaryField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'question'

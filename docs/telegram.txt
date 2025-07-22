@@ -1,6 +1,7 @@
 set_state(
   States.default - состояние, в котором не срабатывают callback (для перехода в главное меню)
   States.category - ходим по кнопочкам структуры бота, выводим тексты, ссылки, карты
+  States.ai_chat - разговор с ИИ (принимается текст)
   NewsForm.waiting_for_content - ждём сообщение которое надо разослать
   NewsForm.waiting_for_confirmation - ждём подтверждения этого сообщения (если "нет", снова waiting_for_content)
   # States.choose_language - выбираем язык

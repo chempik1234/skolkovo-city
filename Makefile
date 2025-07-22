@@ -10,8 +10,10 @@ down:
 deldb:
 	docker volume rm docker_postgres_data
 
-freeze:
+freezeb:
 	 pip freeze > .\bot\requirements.txt
+
+freeze: freezeb
 	 pip freeze > .\skolkovo_admin\requirements.txt
 
 mig:

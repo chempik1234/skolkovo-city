@@ -1,5 +1,3 @@
-import uuid
-
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, relationship
 
@@ -89,4 +87,25 @@ class UserDataModel(Base):
         sa.String(),
         nullable=False,
         default="ru",
+    )
+
+
+class QuestionDataModel(Base):
+    __tablename__ = "question"
+    id: Mapped[int] = sa.Column(
+        sa.Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+    question: Mapped[str] = sa.Column(
+        sa.Text,
+        nullable=False,
+    )
+    answer: Mapped[str] = sa.Column(
+        sa.Text,
+        nullable=True,
+    )
+    embedding = sa.Column(
+        sa.LargeBinary,
+        nullable=True,
     )
