@@ -1,6 +1,8 @@
+from datetime import datetime
+
 import requests
 
-from services.weather_service.repositories.base import WeatherRepositoryBase
+from services.weather_service.repositories.weather.base import WeatherRepositoryBase
 from translation import translate_string as _
 
 
@@ -24,11 +26,11 @@ class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
 
         # Форматируем текст
         weather_text = (
-            f"{_("Погода сегодня", language)}:\n"
-            f"🌡 {_("Температура", language)}: {temp:.1f}°C ({_("ощущается как", language)} {feels_like:.1f}°C)\n"
-            f"☁️ {_("Состояние", language)}: {description}\n"
-            f"💧 {_("Влажность", language)}: {humidity}%\n"
-            f"🌬 {_("Ветер", language)}: {wind_speed} м/с"
+            f"{_("Погода", language)}: ({datetime.today().strftime("%d:%M:%y")})\n"
+            f"🌡 {_("Температура", language)}: *{temp:.1f}°C ({_("ощущается как", language)} {feels_like:.1f}°C)*\n"
+            f"☁️ {_("Состояние", language)}: *{description}*\n"
+            f"💧 {_("Влажность", language)}: *{humidity}%*\n"
+            f"🌬 {_("Ветер", language)}: *{wind_speed} м/с*"
         )
 
         return weather_text

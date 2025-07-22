@@ -10,7 +10,7 @@ from aiogram.types import CallbackQuery
 from bot_functions.category import handle_category
 from config import States  # , RegistrationStates
 from init import users_service
-from init_configs import BOT_ROOT_CATEGORY
+from init.init_0 import BOT_ROOT_CATEGORY
 from translation import translate_string as _  # get_language_for_telegram_id
 from utils import get_logging_extra
 

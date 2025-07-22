@@ -2,11 +2,10 @@ import asyncio
 
 from aiogram.exceptions import TelegramNetworkError
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, InputMediaPhoto, InputMediaVideo, InputMedia, URLInputFile
+from aiogram.types import Message, InputMediaPhoto, InputMedia, URLInputFile
 
-from config import States
 from init import bot, category_service, weather_service
-from init_configs import bot_config
+from init.init_0 import bot_config
 from keyboards import category_keyboard
 from middlewares.prometheus import track_category_click_async
 from models.category import CategoryModel
@@ -61,10 +60,13 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
     asyncio.create_task(delete_media_messages_from_state(state, send_to))
 
     # append weather to text
-    if isinstance(category, CategoryModel) and str(category.id) == bot_config.BOT_ROOT_CATEGORY_STR:
+    if isinstance(category, CategoryModel) and str(category.id) == bot_config.BOT_ROOT_CATEGORY_STR or category is None:
         weather_text = await weather_service.get_weather_text(language)
         if weather_text:
-            text = "/n/n".join([weather_text, text])
+            if "{{weather}}" in text:
+                text.replace("{{weather}}", weather_text)
+            else:
+                text = "\n\n".join([weather_text, text])
 
     await state.update_data({"media_messages": []})
 

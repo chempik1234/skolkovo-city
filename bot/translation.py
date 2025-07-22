@@ -2,8 +2,8 @@ import csv
 import os
 from collections import defaultdict
 
-from init import users_service
-from init_configs import bot_config
+from init.init_1 import users_service
+from init.init_0 import bot_config
 from models.category import CategoryModel
 
 

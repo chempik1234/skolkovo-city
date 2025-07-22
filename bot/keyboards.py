@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from init import category_service
-from init_configs import BOT_ROOT_CATEGORY
+from init.init_0 import BOT_ROOT_CATEGORY
 from models.category import CategoryModel
 from utils import get_title_for_language as _t
 from translation import translate_string as _

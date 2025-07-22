@@ -5,10 +5,10 @@ from typing import Tuple
 
 import structlog
 from aiogram.enums import InputMediaType
-from aiogram.types import InputMediaPhoto, InputMedia, InputFile, InputMediaVideo, InputMediaAnimation
+from aiogram.types import InputMediaPhoto, InputMediaVideo
 
 from init import bot, app, news_service, create_dp
-from init_configs import bot_config
+from init.init_0 import bot_config
 from middlewares.prometheus import prometheus_middleware_factory
 from start_bot import start_bot
 from utils import get_logging_extra
