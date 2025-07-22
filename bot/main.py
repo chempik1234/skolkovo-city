@@ -1,13 +1,12 @@
 # part of it was made by donBarbos https://github.com/donBarbos/telegram-bot-template
 import asyncio
-import structlog
 
 import structlog
 
 from init import bot, dp, app, reloader_service, news_repo
 from handlers import routers_list
 from commands import router as commands_router
-from init_configs import bot_config
+from init.init_0 import bot_config
 from middlewares.check_registration_middleware import CheckRegistrationMiddleware
 from middlewares.prometheus import prometheus_middleware_factory
 from start_bot import start_bot

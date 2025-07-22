@@ -1,7 +1,4 @@
-import asyncio
 import structlog
-import time
-import uuid
 
 from aiogram import Router
 from aiogram.filters.command import Command
@@ -12,7 +9,7 @@ from bot_functions.category import handle_category
 from bot_functions.settings import make_user_choose_language
 from config import NewsForm, States
 from init import category_service, users_service, reloader_service
-from init_configs import BOT_ROOT_CATEGORY
+from init.init_0 import BOT_ROOT_CATEGORY
 from utils import get_logging_extra
 
 logger = structlog.get_logger(name="commands")

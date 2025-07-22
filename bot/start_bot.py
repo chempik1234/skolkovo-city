@@ -6,7 +6,7 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 from aiohttp.web_app import Application
 from aiohttp.web_runner import AppRunner, TCPSite
 
-from init_configs import bot_config
+from init.init_0 import bot_config
 
 logger = structlog.get_logger(name="start_bot")
 
