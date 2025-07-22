@@ -64,7 +64,7 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         weather_text = await weather_service.get_weather_text(language)
         if weather_text:
             if "{{weather}}" in text:
-                text.replace("{{weather}}", weather_text)
+                text = text.replace("{{weather}}", weather_text)
             else:
                 text = "\n\n".join([weather_text, text])
 
