@@ -80,25 +80,25 @@ async def start():
                 animation = content["animation"]
                 if not photo and not video and not animation:
                     logger.info("- recognized as pure text", extra_data=logging_extra)
-                    await bot.send_message(telegram_id, text)
+                    await bot.send_message(telegram_id, text, parse_mode=None)
                 elif photo:
                     logger.info("- recognized as photo", extra_data=logging_extra)
-                    await bot.send_photo(telegram_id, photo, caption=caption)
+                    await bot.send_photo(telegram_id, photo, caption=caption, parse_mode=None)
                 elif video:
                     logger.info("- recognized as video", extra_data=logging_extra)
-                    await bot.send_video(telegram_id, video, caption=caption)
+                    await bot.send_video(telegram_id, video, caption=caption, parse_mode=None)
                 elif animation:
-                    logger.info("- recognized as animation", extra_data=logging_extra)
-                    await bot.send_animation(telegram_id, animation)
+                    logger.info("- recognized as animation", extra_data=logging_extra, parse_mode=None)
+                    await bot.send_animation(telegram_id, animation, parse_mode=None)
             elif isinstance(content, list):
                 media_group = []
                 for message_part in content:
                     caption = message_part["caption"]
                     media_type, media = get_media_type_and_media(message_part)
                     if media_type == InputMediaType.PHOTO:
-                        media_group.append(InputMediaPhoto(media=media, caption=caption))
+                        media_group.append(InputMediaPhoto(media=media, caption=caption, parse_mode=None))
                     elif media_type == InputMediaType.VIDEO:
-                        media_group.append(InputMediaVideo(media=media, caption=caption))
+                        media_group.append(InputMediaVideo(media=media, caption=caption, parse_mode=None))
                 await bot.send_media_group(chat_id=telegram_id, media=media_group)
 
             logger.info("- message sent", extra_data=logging_extra)
