@@ -14,7 +14,8 @@ class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
         self.api_key = api_key
 
     async def get_weather_text(self, language: str) -> str:
-        response = requests.get(self.url, params={"lat": self.lat, "lon": self.lon, "appid": self.api_key, "lang": language})
+        response = requests.get(self.url, params={"lat": self.lat, "lon": self.lon, "appid": self.api_key,
+                                                  "lang": language, "units": "metric"})
         response.raise_for_status()
         data = response.json()
 
