@@ -28,7 +28,7 @@ def load_translations(filepath) -> dict:
                 languages = row.copy()
                 continue
             for ind, word in enumerate(row):
-                result[word] = defaultdict(lambda: "???", {lang: word for lang, word in zip(languages[: ind]+languages[ind+1:], row[: ind]+row[ind+1:])})
+                result[word] = defaultdict(lambda: "???", {lang: word for lang, word in zip(languages, row)})
     return result
 
 
