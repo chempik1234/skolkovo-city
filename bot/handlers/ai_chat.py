@@ -7,9 +7,10 @@ from aiogram.types import Message, CallbackQuery
 from bot_functions.ai_chat import unknown_question
 from config import States
 from init.init_0 import bot_config
-from init.init_2 import ai_chat_service
+from init.init_2 import ai_chat_service, bot
 from keyboards import ai_response_keyboard
 from translation import translate_string as _, get_language_for_telegram_id as _l
+from utils import split_text_for_telegram
 
 logger = structlog.get_logger(name="handlers.ai_chat")
 
@@ -33,12 +34,31 @@ async def ai_chat_message_handler(message: Message, state: FSMContext):
                                  reply_markup=ai_response_keyboard(question_text, language))
 
     except Exception as e:
-        logger.error("error while asking bot a question", exc_info=e, extra_data={"question": question_text})
+        logger.error("error while embedding", exc_info=e, extra_data={"question": question_text})
 
         await message.answer(_("Не удалось получить ответ на вопрос", language))
 
 
 @router.callback_query(F.data.startswith("bad_answer_"))
 async def bad_answer_callback(callback: CallbackQuery, state: FSMContext):
-    message_text = callback.data.replace("bad_answer_", "", 1)
-    await unknown_question(callback.message.chat.id, message_text)
+    question_text = callback.data.replace("bad_answer_", "", 1)
+    await unknown_question(callback.message.chat.id, question_text)
+
+    user_id = callback.from_user.id
+
+    language = await _l(user_id)
+
+    try:
+        answer = await ai_chat_service.get_response(user_id, question_text)  # message.from_user.id,
+        split_answer = split_text_for_telegram(answer)
+
+        for string in split_answer[: -1]:
+            await bot.send_message(user_id, string, parse_mode=None)
+        if split_answer:
+            await bot.send_message(user_id, split_answer[-1], parse_mode=None,
+                                   reply_markup=ai_response_keyboard(question_text, language))
+
+    except Exception as e:
+        logger.error("error while asking bot a question", exc_info=e, extra_data={"question": question_text})
+
+        await bot.send_message(user_id, _("Не удалось получить ответ на вопрос", language))

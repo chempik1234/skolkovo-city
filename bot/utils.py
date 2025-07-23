@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import Any
+from typing import Any, Iterable
 
 from translation import *
 
@@ -42,3 +42,7 @@ def get_seconds_till_next_weather() -> int:
 
     time_difference = next_time - now
     return int(time_difference.total_seconds())
+
+
+def split_text_for_telegram(string: str) -> list[str]:
+    return [string[i: i + 4000] for i in range(0, len(string), 4000)]

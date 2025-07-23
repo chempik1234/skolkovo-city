@@ -15,11 +15,12 @@ class QuestionsStorageRepositoryPostgres(PostgresMixin, QuestionsStorageReposito
         super().__init__(sqlalchemy_session_maker, model=QuestionDataModel)
 
     async def get_answered_questions(self) -> Iterable[QuestionDataModel]:
-        return await self.get_objects()
+        return await self.get_objects(QuestionDataModel.answer != None)
 
     async def set_embedding(self, existing_object: model, embedding: np.ndarray):
         existing_object.embedding = embedding_to_bytes(embedding)
         return await self.update_data(existing_object, {"embedding": existing_object.embedding})
 
     async def create_new_question(self, question: str) -> None:
-        await self.create_object(QuestionDataModel(question=question))
+        if not await self.get_object(question=question):
+            await self.create_object(QuestionDataModel(question=question))

@@ -20,9 +20,9 @@ class PostgresMixin:
             if value is not None and hasattr(data_object, key):
                 setattr(data_object, key, value)
 
-    async def get_objects(self, **filters) -> Iterable[model]:
+    async def get_objects(self, *filters, **filters_by) -> Iterable[model]:
         async with self.session_maker(expire_on_commit=False) as db_session:
-            result = await db_session.execute(select(self.model).filter_by(**filters))
+            result = await db_session.execute(select(self.model).filter(*filters).filter_by(**filters_by))
             return result.scalars().all()
 
     async def get_object(self, **kwargs) -> model | None:

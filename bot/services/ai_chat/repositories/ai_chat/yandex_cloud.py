@@ -1,4 +1,6 @@
 import structlog
+from yandex_cloud_ml_sdk._models.completions.result import Alternative
+
 from .base import AiChatRepositoryBase
 
 logger = structlog.get_logger("yandex_chat_bot")
@@ -9,12 +11,12 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         self.model = model
 
     async def get_response(self, telegram_id: int | str, question: str) -> str:
-        response = self.model.run(
+        response: list[Alternative] = self.model.run(
             [
                 {"role": "system",
-                 "text": "Пользователь спросил у тебя что-то, ищи ответ в базе знаний и если не найдёшь, "
-                         "то порекомендуй обратиться в колл-центр. В случае, если он спрашивает что-то нерелевантное, "
-                         "скажи ему об этом"},
+                 "text": "Пользователь задал вопрос, которого нет в базе. Попробуй ответить на него сам, и если не "
+                         "сможешь, то переведи на колл-цнентр +74959560033. Пиши кратко и по делу: ответ ограничен "
+                         "1000 символами"},
                 {
                     "role": "user",
                     "text": question,
@@ -22,4 +24,4 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
             ]
         )
 
-        return '\n\n'.join([str(i) for i in response])
+        return '\n\n'.join([i.text for i in response])

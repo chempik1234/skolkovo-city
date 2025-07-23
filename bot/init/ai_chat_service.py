@@ -13,13 +13,14 @@ from services.ai_chat.service import AiChatService
 # question_lookup_repo = QuestionLookupRepositorySentenceTransformer(embedding_model_ru)
 question_lookup_repo = QuestionLookupRepository(bot_config.YANDEX_CLOUD_FOLDER, bot_config.YANDEX_CLOUD_API_KEY)
 question_storage_repo = QuestionsStorageRepositoryPostgres(postgres_conn)
-# yandex_ai_sdk = YCloudML(
-#     folder_id=bot_config.YANDEX_CLOUD_FOLDER, auth=bot_config.YANDEX_CLOUD_API_KEY
-# )
-# model = yandex_ai_sdk.models.completions("yandexgpt-lite", model_version="rc")
-# model = model.configure(temperature=0.3)
 
-# ai_chat_repo = AiChatRepositoryYandexCloud(model)
-ai_chat_service = AiChatService(ai_chat_repo=None,
+yandex_ai_sdk = YCloudML(
+    folder_id=bot_config.YANDEX_CLOUD_FOLDER, auth=bot_config.YANDEX_CLOUD_API_KEY
+)
+model = yandex_ai_sdk.models.completions("yandexgpt-lite", model_version="rc")
+model = model.configure(temperature=0.3)
+ai_chat_repo = AiChatRepositoryYandexCloud(model)
+
+ai_chat_service = AiChatService(ai_chat_repo=ai_chat_repo,
                                 question_lookup_repo=question_lookup_repo,
                                 questions_storage_repo=question_storage_repo)
