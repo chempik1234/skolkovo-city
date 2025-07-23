@@ -74,13 +74,28 @@ language_keyboards = InlineKeyboardMarkup(
     ],
 )
 
+
 def ai_response_keyboard(question_str: str, language: str) -> InlineKeyboardMarkup:
+    #TODO: remove question str
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
                 InlineKeyboardButton(
                     text="👎" + _("Не нравится ответ", language),
-                    callback_data="bad_answer_" + question_str,
+                    callback_data="bad_answer_",  # + question_str,
+                ),
+            ],
+        ],
+    )
+
+
+def ask_ai_keyboard(language: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=_("Позвать Yandex GPT", language),
+                    callback_data="ask_ai"
                 ),
             ],
         ],

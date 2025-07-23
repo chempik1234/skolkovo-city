@@ -76,6 +76,7 @@ class BotConfig(Config):
 class States(StatesGroup):
     default = State()
     category = State()
+    ai_embedding = State()
     ai_chat = State()
 
 

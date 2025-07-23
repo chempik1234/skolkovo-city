@@ -30,22 +30,32 @@ class AiChatService:
         accepts a question and returns related question and answer from storage, recalculates embeddings when NULL
         if no questions then return ("" "" None)
         """
-        async def process_question(question) -> Tuple[np.float64, str, str]:
+        async def process_question(question) -> Tuple[np.float64, str, str] | None:
             # get embedding from remote API
             if not question.embedding:
                 logger.info("new embedding for question", extra_data={"question_id": question.id})
 
-                embedding = await self.question_lookup_repo.get_embedding(question.question)
-                await self.questions_storage_repo.set_embedding(question, embedding)
+                try:
+                    embedding = await self.question_lookup_repo.get_embedding(question.question)
+                    await self.questions_storage_repo.set_embedding(question, embedding)
+                except Exception as e:
+                    logger.error("error while getting embedding for question",
+                                 extra_data={"question_id": question.id}, exc_info=e)
+                    return None
             # or get from cache e.g. Postgres
             else:
                 embedding = embedding_from_bytes(question.embedding)
 
-            return (
-                await self.question_lookup_repo.get_similarity(embedding, user_question),
-                question.question,
-                question.answer,
-            )
+            try:
+                return (
+                    await self.question_lookup_repo.get_similarity(embedding, user_question),
+                    question.question,
+                    question.answer,
+                )
+            except Exception as e:
+                logger.error("error while getting similarity for question",
+                             extra_data={"question_id": question.id, 'user_question': user_question}, exc_info=e)
+                return None
 
         questions = await self.questions_storage_repo.get_answered_questions()
 

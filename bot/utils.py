@@ -46,3 +46,18 @@ def get_seconds_till_next_weather() -> int:
 
 def split_text_for_telegram(string: str) -> list[str]:
     return [string[i: i + 4000] for i in range(0, len(string), 4000)]
+
+
+def today_date() -> str:
+    return datetime.date.today().strftime("%Y-%m-%d")
+
+
+async def today_date_async() -> str:
+    return today_date()
+
+
+async def calculator_async(expression: str) -> str:
+    try:
+        return eval(expression)
+    except Exception:
+        return "invalid expression"
