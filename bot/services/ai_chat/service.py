@@ -1,6 +1,7 @@
 import asyncio
-from typing import Tuple
+from typing import Tuple, Any
 
+import numpy as np
 import structlog
 
 from ai_utils import embedding_from_bytes
@@ -24,11 +25,12 @@ class AiChatService:
     async def get_response(self, telegram_id: int | str, question: str) -> str:
         return await self.ai_chat_repo.get_response(telegram_id, question)
 
-    async def get_related_question_from_db(self, user_question: str) -> Tuple[str, str]:
+    async def get_related_question_from_db(self, user_question: str) -> Tuple[str, str, np.float64 | None]:
         """
         accepts a question and returns related question and answer from storage, recalculates embeddings when NULL
+        if no questions then return ("" "" None)
         """
-        async def process_question(question):
+        async def process_question(question) -> Tuple[np.float64, str, str]:
             # get embedding from remote API
             if not question.embedding:
                 logger.info("new embedding for question", extra_data={"question_id": question.id})
@@ -60,4 +62,7 @@ class AiChatService:
             if max_value is None or max_value is not None and max_value < result[0]:
                 max_value, related_question, answer = result
 
-        return related_question, answer
+        return related_question, answer, max_value
+
+    async def create_new_question(self, question: str) -> None:
+        await self.questions_storage_repo.create_new_question(question)

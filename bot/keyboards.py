@@ -73,3 +73,15 @@ language_keyboards = InlineKeyboardMarkup(
         ],
     ],
 )
+
+def ai_response_keyboard(question_str: str, language: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="👎" + _("Не нравится ответ", language),
+                    callback_data="bad_answer_" + question_str,
+                ),
+            ],
+        ],
+    )

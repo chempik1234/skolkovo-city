@@ -1,7 +1,8 @@
-from typing import Any, Iterable
+from typing import Any, Iterable, Coroutine
 
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.testing import db_spec
 
 from db import Base
@@ -43,11 +44,14 @@ class PostgresMixin:
             except IntegrityError:
                 await db_session.rollback()
 
-    async def create_object(self, data_dict) -> model:
+    async def create_object(self, data_dict: dict | model) -> DeclarativeBase | None | Any:
         async with self.session_maker(expire_on_commit=False) as db_session:
             try:
-                new_object = self.model()
-                self._model_attrs_from_dict(new_object, data_dict)
+                if isinstance(data_dict, dict):
+                    new_object = self.model()
+                    self._model_attrs_from_dict(new_object, data_dict)
+                else:
+                    new_object = data_dict
                 db_session.add(new_object)
                 await db_session.commit()
                 return new_object

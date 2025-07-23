@@ -3,7 +3,7 @@ import typing
 
 from aiogram.fsm.state import StatesGroup, State
 from betterconf import Config
-from betterconf.caster import IntCaster, BoolCaster
+from betterconf.caster import IntCaster, BoolCaster, FloatCaster
 from betterconf.config import Field
 from dotenv import load_dotenv
 
@@ -60,6 +60,10 @@ class BotConfig(Config):
 
     YANDEX_CLOUD_FOLDER: str = Field("YANDEX_CLOUD_FOLDER")
     YANDEX_CLOUD_API_KEY: str = Field("YANDEX_CLOUD_API_KEY")
+
+    EMBEDDING_THRESHOLD: float = Field("EMBEDDING_THRESHOLD", caster=FloatCaster())
+    EMBEDDING_NOT_FOUND_MESSAGE_RU: str = Field("EMBEDDING_NOT_FOUND_MESSAGE_RU")
+    EMBEDDING_NOT_FOUND_MESSAGE_EN: str = Field("EMBEDDING_NOT_FOUND_MESSAGE_EN")
 
     @property
     def BOT_WEBHOOK_URL(self):

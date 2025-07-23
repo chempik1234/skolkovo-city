@@ -33,6 +33,7 @@ class QuestionLookupRepository(QuestionLookupRepositoryBase):
             "text": text,
         }
 
+        response_json = requests.post(self.embed_url, json=query_data, headers=self.headers).json()
         return np.array(
-            requests.post(self.embed_url, json=query_data, headers=self.headers).json()["embedding"]
+            response_json["embedding"]
         )

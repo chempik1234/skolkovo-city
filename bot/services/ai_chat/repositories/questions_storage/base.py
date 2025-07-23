@@ -11,3 +11,6 @@ class QuestionsStorageRepositoryBase:
 
     async def set_embedding(self, existing_object: QuestionDataModel, embedding: np.ndarray):
         raise NotImplementedError()
+
+    async def create_new_question(self, question: str) -> None:
+        raise NotImplementedError()
