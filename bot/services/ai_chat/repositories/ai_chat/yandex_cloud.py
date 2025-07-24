@@ -36,6 +36,16 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
         self.create_tools(tools)
 
+        self._system_prompts_version = 1
+        self._system_prompts = [
+            f"version_{self._system_prompts_version}",
+            "Пользователь задаёт вопросы, которых не нашлось в базе эмбеддингов."
+            "Попробуй ответить на него сам, и если не сможешь, то переведи на колл-центр +74959560033. "
+            "Пиши кратко и по делу, в формате Markdown под мессенджер телеграм. ",
+            "If the question is in english, you must answer in english! "
+            "Use the same language as the question is written in"
+        ]
+
     def create_tools(self, tools):
         self.tools = tools + [
             self.sdk.tools.function(
@@ -94,16 +104,9 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
         thread = await self.get_thread_for_user(telegram_id)
 
-        is_there_system_message = False
-        async for _ in thread:
-            is_there_system_message = True
-        if not is_there_system_message:
-            await thread.write(
-                {"role": "user",
-                 "text": "Пользователь задал вопрос, которого нет в базе. Попробуй ответить на него сам, и если не "
-                         "сможешь, то переведи на колл-центр +74959560033. Пиши кратко и по делу, в формате Markdown под "
-                         "мессенджер телеграм"}
-            )
+        # We need to know if NEWEST system prompt was deployed, so we check it's version (LATEST ENTRANCE)
+        await self.update_thread_system_message(thread)
+
         await thread.write({
             "role": "user",
             "text": question,
@@ -140,7 +143,24 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         return result
 
     async def _get_chat_story(self, thread: AsyncThread, *args, **kwargs) -> str:
-        result = [message.text async for message in thread]
+        result = [message.text async for message in thread if not message.text in self._system_prompts]
+        assert all(not i in self._system_prompts for i in result)
         if result:
             return "\n\nnext_data_piece:\n\n".join(result)
         return "empty data, brand new thread"
+
+    async def update_thread_system_message(self, thread: AsyncThread):
+        version = None
+        async for message in thread:
+            if not isinstance(version, int):
+                message_text = message.text
+                version = message_text.replace("version_", "", 1) if message_text.startswith("version_") else None
+                if isinstance(version, str) and version.isdigit() and version:
+                    version = int(version)
+
+        if not isinstance(version, int) or isinstance(version, int) and version < self._system_prompts_version:  # <-- Hardcoded number
+            for text in self._system_prompts:
+                await thread.write(
+                    {"role": "user",
+                     "text": text}
+                )

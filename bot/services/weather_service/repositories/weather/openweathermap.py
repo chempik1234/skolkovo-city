@@ -4,7 +4,7 @@ import requests
 
 from services.weather_service.repositories.weather.base import WeatherRepositoryBase
 from translation import translate_string as _
-from custom_types import Language
+from custom_types import Language, LanguageEnum
 
 
 class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
@@ -15,10 +15,7 @@ class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
         self.api_key = api_key
 
     async def get_weather_text(self, language: Language) -> str:
-        response = requests.get(self.url, params={"lat": self.lat, "lon": self.lon, "appid": self.api_key,
-                                                  "lang": language, "units": "metric"})
-        response.raise_for_status()
-        data = response.json()
+        data = await self._get_service_response(language)
 
         temp = data["main"]["temp"]
         feels_like = data["main"]["feels_like"]
@@ -36,3 +33,13 @@ class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
         )
 
         return weather_text
+
+    async def get_weather_raw(self) -> str:
+        return str(await self._get_service_response())
+
+    async def _get_service_response(self, language: Language = LanguageEnum.ru) -> dict:
+        response = requests.get(self.url, params={"lat": self.lat, "lon": self.lon, "appid": self.api_key,
+                                                  "lang": language, "units": "metric"})
+        response.raise_for_status()
+        data = response.json()
+        return data

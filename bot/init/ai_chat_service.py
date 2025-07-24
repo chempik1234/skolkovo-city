@@ -5,6 +5,7 @@ from yandex_cloud_ml_sdk import AsyncYCloudML
 
 from init.init_0 import bot_config
 from init.init_1 import postgres_conn, redis_conn_users
+from init.weather import weather_service
 from services.ai_chat.repositories.ai_chat.thread_storage.redis import ThreadStorageRepositoryRedis
 from services.ai_chat.repositories.ai_chat.yandex_cloud import AiChatRepositoryYandexCloud
 from services.ai_chat.repositories.question_lookup.yandex_cloud import QuestionLookupRepository
@@ -89,6 +90,15 @@ tools = [
             },
             "required": ["expression"],
         }
+    ),
+    yandex_ai_sdk.tools.function(
+        name="weather",
+        description="Get current weather in Skolkovo (not any other city) in json format from an API",
+        parameters={
+            "type": "object",
+            "properties": {},
+            "required": [],
+        }
     )
 ]
 
@@ -103,6 +113,7 @@ function_map = {
     "events_list": events_service.get_events_list,
     "today_date": today_date_async,
     "calculator": calculator_async,
+    "weather": weather_service.get_weather_raw,
 }
 
 ai_chat_repo = AiChatRepositoryYandexCloud(yandex_ai_sdk, model, function_map, thread_storage_repo, tools)

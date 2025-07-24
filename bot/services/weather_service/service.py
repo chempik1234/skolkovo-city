@@ -4,7 +4,7 @@ import structlog
 
 from services.weather_service.repositories.weather.base import WeatherRepositoryBase
 from services.weather_service.repositories.cache.base import WeatherCacheRepositoryBase
-from custom_types import Language
+from custom_types import Language, LanguageEnum
 
 logger = structlog.get_logger("weather_service")
 
@@ -14,7 +14,16 @@ class WeatherService:
         self.repos = repos
         self.cache_repo = cache_repo
 
-    async def get_weather_text(self, language: Language) -> str | None:
+    async def get_weather_raw(self) -> str | None:
+        for repo in self.repos:
+            try:
+                text = await repo.get_weather_raw()
+                if text:
+                    return text
+            except Exception as e:
+                logger.error("exception while getting weather raw", exc_info=e)
+
+    async def get_weather_text(self, language: Language = LanguageEnum.ru) -> str | None:
         text = await self.cache_repo.get_text(language)
         if text:
             return text

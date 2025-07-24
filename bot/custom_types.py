@@ -1,9 +1,8 @@
-from enum import Enum
 from typing import Literal
 
 Language = Literal['ru', 'en']
 
 
-class LanguageEnum(Enum):
+class LanguageEnum:
     en = 'en'
     ru = 'ru'

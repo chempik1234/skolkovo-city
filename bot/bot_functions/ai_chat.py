@@ -10,6 +10,7 @@ from init import bot
 from init.ai_chat_service import ai_chat_service
 from init.init_0 import bot_config
 from keyboards import ask_ai_keyboard, ai_response_keyboard
+from retry import retry_async, retry_async_generator
 from translation import get_language_for_telegram_id as _l,  translate_string as _
 from utils import split_text_for_telegram, get_logging_extra
 
@@ -49,7 +50,20 @@ async def ask_chat_bot(user_id: int | str, question_text: str,
     wait_for_answer_message = None
     try:
         wait_for_answer_message = await bot.send_message(chat_id=user_id, text="⏲️")
-        answer = await ai_chat_service.get_response(user_id, question_text)  # message.from_user.id,
+
+        # Try to get response from AI for 3 times
+        async for retry_response in retry_async_generator(
+                ai_chat_service.get_response,
+                tries=3,
+                function_args=(user_id, question_text),
+        ):  # message.from_user.id,
+            success, ai_answer = retry_response
+            if success:
+                answer = ai_answer
+                break
+            await bot.send_message(user_id, _("Неудачная попытка, пробуем ещё раз...", language))
+
+        # Success, else we would be in except
         logger.info("got answer from AI Chatbot", extra_data=logging_extra)
 
         async def send_answer(answer_, parse_mode_) -> Message | None:
