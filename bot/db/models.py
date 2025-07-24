@@ -101,7 +101,11 @@ class QuestionDataModel(Base):
         sa.Text,
         nullable=False,
     )
-    answer: Mapped[str] = sa.Column(
+    answer_ru: Mapped[str] = sa.Column(
+        sa.Text,
+        nullable=True,
+    )
+    answer_en: Mapped[str] = sa.Column(
         sa.Text,
         nullable=True,
     )
@@ -109,3 +113,9 @@ class QuestionDataModel(Base):
         sa.LargeBinary,
         nullable=True,
     )
+
+    category_id = sa.Column(
+        sa.ForeignKey("category.id", ondelete="SET_NULL"),
+        nullable=True,
+    )
+    category: Mapped["CategoryDataModel"] = relationship()

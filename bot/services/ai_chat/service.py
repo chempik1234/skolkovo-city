@@ -5,10 +5,12 @@ import numpy as np
 import structlog
 
 from ai_utils import embedding_from_bytes
+from models.ai_chat import Question
 from services.ai_chat.repositories.ai_chat.base import AiChatRepositoryBase
 from services.ai_chat.repositories.question_lookup.base import QuestionLookupRepositoryBase
 from services.ai_chat.repositories.questions_storage.base import QuestionsStorageRepositoryBase
 from services.rate_limiter.service import RateLimiterService
+from custom_types import Language, LanguageEnum
 
 logger = structlog.get_logger("services.ai_chat")
 
@@ -28,14 +30,17 @@ class AiChatService:
     async def get_response(self, telegram_id: int | str, question: str) -> str:
         return await self.ai_chat_repo.get_response(telegram_id, question)
 
-    async def get_related_question_from_db(self, user_question: str) -> Tuple[str, str, np.float64 | None]:
+    async def get_related_question_from_db(self, user_question: str, language: Language) -> Tuple[Question | None, np.float64 | None]:
         """
         accepts a question and returns related question and answer from storage, recalculates embeddings when NULL
+
+        (question, answer_text, category_id, embedding_value)
+
         if no questions then return ("" "" None)
         """
-        user_embedding = self.question_lookup_repo.get_embedding(user_question)
+        user_embedding = await self.question_lookup_repo.get_embedding(user_question)
 
-        async def process_question(question) -> Tuple[np.float64, str, str] | None:
+        async def process_question(question) -> Tuple[np.float64, Question] | None:
             # get embedding from remote API
             if not question.embedding:
                 logger.info("new embedding for question", extra_data={"question_id": question.id})
@@ -54,30 +59,28 @@ class AiChatService:
             try:
                 return (
                     await self.question_lookup_repo.get_similarity(embedding, user_embedding),
-                    question.question,
-                    question.answer,
+                    question,
                 )
             except Exception as e:
                 logger.error("error while getting similarity for question",
                              extra_data={"question_id": question.id, 'user_question': user_question}, exc_info=e)
                 return None
 
-        questions = await self.questions_storage_repo.get_answered_questions()
+        questions = await self.questions_storage_repo.get_answered_questions(language=language)
 
         similarities = await asyncio.gather(
             *[process_question(question) for question in questions]
         )
 
         # max_value, related_question = max([i for i in similarities if isinstance(i, tuple)])
-        max_value = None
-        related_question = answer = ""
+        max_value = question = None
         for result in similarities:
             if not isinstance(result, tuple):
                 continue
             if max_value is None or max_value is not None and max_value < result[0]:
-                max_value, related_question, answer = result
+                max_value, question = result
 
-        return related_question, answer, max_value
+        return question, max_value
 
     async def create_new_question(self, telegram_id: int | str, question: str) -> None:
         if await self.rate_limiter.can_user_do_action(telegram_id):

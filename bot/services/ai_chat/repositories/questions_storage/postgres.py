@@ -6,6 +6,9 @@ from ai_utils import embedding_to_bytes
 from db.models import QuestionDataModel
 from services.ai_chat.repositories.questions_storage.base import QuestionsStorageRepositoryBase
 from services.postgres_mixin import PostgresMixin
+from custom_types import Language, LanguageEnum
+
+from sqlalchemy import or_
 
 
 class QuestionsStorageRepositoryPostgres(PostgresMixin, QuestionsStorageRepositoryBase):
@@ -14,8 +17,10 @@ class QuestionsStorageRepositoryPostgres(PostgresMixin, QuestionsStorageReposito
     def __init__(self, sqlalchemy_session_maker):
         super().__init__(sqlalchemy_session_maker, model=QuestionDataModel)
 
-    async def get_answered_questions(self) -> Iterable[QuestionDataModel]:
-        return await self.get_objects(QuestionDataModel.answer != None)
+    async def get_answered_questions(self, language: Language) -> Iterable[QuestionDataModel]:
+        if language == LanguageEnum.en:
+            return await self.get_objects(or_(QuestionDataModel.answer_en != None, QuestionDataModel.category_id != None))
+        return await self.get_objects(QuestionDataModel.category_id != None)
 
     async def set_embedding(self, existing_object: model, embedding: np.ndarray):
         existing_object.embedding = embedding_to_bytes(embedding)

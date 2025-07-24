@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from enum import EnumType
 from typing import Any, Iterable
 
 from translation import *

@@ -115,8 +115,20 @@ class Video(models.Model):
 
 class Question(models.Model):
     question = models.TextField(null=False, blank=False)
-    answer = models.TextField(null=True, blank=True)
+    answer_ru = models.TextField(null=True, blank=True)
+    answer_en = models.TextField(null=True, blank=True)
     embedding = models.BinaryField(null=True, blank=True)
+
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        db_column='category_id',
+        blank=True,
+        null=True,
+        # related_name='questions',
+    )
 
     class Meta:
         db_table = 'question'
+        verbose_name = 'Вопрос'
+        verbose_name_plural = 'Вопросы'

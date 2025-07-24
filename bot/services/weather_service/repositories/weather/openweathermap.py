@@ -4,6 +4,7 @@ import requests
 
 from services.weather_service.repositories.weather.base import WeatherRepositoryBase
 from translation import translate_string as _
+from custom_types import Language
 
 
 class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
@@ -13,7 +14,7 @@ class WeatherRepositoryOpenWeatherMap(WeatherRepositoryBase):
         self.lon = lon
         self.api_key = api_key
 
-    async def get_weather_text(self, language: str) -> str:
+    async def get_weather_text(self, language: Language) -> str:
         response = requests.get(self.url, params={"lat": self.lat, "lon": self.lon, "appid": self.api_key,
                                                   "lang": language, "units": "metric"})
         response.raise_for_status()

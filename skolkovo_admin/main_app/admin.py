@@ -100,7 +100,8 @@ class VideoAdmin(admin.ModelAdmin):
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ("question",)
+    list_display = ("question", "category",)
     list_filter = (
-        ("answer", admin.EmptyFieldListFilter),
+        ("answer_ru", admin.EmptyFieldListFilter),
+        ("category_id", admin.EmptyFieldListFilter),
     )

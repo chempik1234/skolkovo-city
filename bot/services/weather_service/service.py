@@ -4,6 +4,7 @@ import structlog
 
 from services.weather_service.repositories.weather.base import WeatherRepositoryBase
 from services.weather_service.repositories.cache.base import WeatherCacheRepositoryBase
+from custom_types import Language
 
 logger = structlog.get_logger("weather_service")
 
@@ -13,7 +14,7 @@ class WeatherService:
         self.repos = repos
         self.cache_repo = cache_repo
 
-    async def get_weather_text(self, language: str) -> str | None:
+    async def get_weather_text(self, language: Language) -> str | None:
         text = await self.cache_repo.get_text(language)
         if text:
             return text
