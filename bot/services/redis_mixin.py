@@ -1,11 +1,6 @@
-import json
 from typing import Any, Callable
 
 from redis import Redis
-from sqlalchemy.orm import Mapped
-
-from db.models import UserDataModel
-from services.user_service.repositories.cache.base import UserCacheRepositoryBase
 
 
 class RedisMixin:
@@ -16,8 +11,8 @@ class RedisMixin:
     def get(self, key: Any) -> Any:
         return self.redis.get(key)
 
-    def set(self, key: Any, value: Any) -> None:
-        self.redis.set(key, value, ex=self.expire_callable())
+    def set(self, key: Any, value: Any, ex: int | None = None) -> None:
+        self.redis.set(key, value, ex=self.expire_callable() if ex is None else ex)
 
     def delete(self, key: Any) -> None:
         self.redis.delete(key)

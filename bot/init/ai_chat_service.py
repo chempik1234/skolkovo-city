@@ -12,7 +12,16 @@ from services.ai_chat.repositories.questions_storage.postgres import QuestionsSt
 from services.ai_chat.service import AiChatService
 from services.events.repositories.http import EventsRepositoryHTTP
 from services.events.service import EventsService
+from services.rate_limiter.repositories.redis import RateLimiterRepositoryRedisFixedWindow
+from services.rate_limiter.service import RateLimiterService
 from utils import today_date_async, calculator_async
+
+rate_limiter_repo_create_questions = RateLimiterRepositoryRedisFixedWindow(
+    redis_conn_users,
+    window_period_seconds=bot_config.RATE_LIMITER_SAVE_QUESTION_FIXED_WINDOW_SECONDS,
+    max_counter_value=bot_config.RATE_LIMITER_SAVE_QUESTION_FIXED_WINDOW_MAX_COUNTER
+)
+rate_limiter_service_create_questions = RateLimiterService(rate_limiter_repo_create_questions, "create_questions")
 
 events_repo = EventsRepositoryHTTP("https://api.events.sk.ru/event/list")
 events_service = EventsService(events_repo)
@@ -100,4 +109,6 @@ ai_chat_repo = AiChatRepositoryYandexCloud(yandex_ai_sdk, model, function_map, t
 
 ai_chat_service = AiChatService(ai_chat_repo=ai_chat_repo,
                                 question_lookup_repo=question_lookup_repo,
-                                questions_storage_repo=question_storage_repo)
+                                questions_storage_repo=question_storage_repo,
+                                rate_limiter=rate_limiter_service_create_questions,
+                                )

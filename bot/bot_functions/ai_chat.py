@@ -27,7 +27,7 @@ async def begin_ai_chat(chat_id: int | str, state: FSMContext):
 async def unknown_question(chat_id: int | str, question: str, be_silent: bool = False):
     logger.info("received an unanswered question", question=question)
 
-    asyncio.create_task(ai_chat_service.create_new_question(question))
+    asyncio.create_task(ai_chat_service.create_new_question(chat_id, question))
 
     if not be_silent:
         language = await _l(chat_id)

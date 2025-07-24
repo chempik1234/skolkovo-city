@@ -10,9 +10,7 @@ class QuestionLookupRepositoryBase:
     async def get_related_question(self, question: str, questions: Iterable[str]) -> str:
         raise NotImplementedError()
 
-    async def get_similarity(self, db_embedding: np.ndarray, new_question: str) -> Any:
-        new_embedding = await self.get_embedding(new_question)
-
+    async def get_similarity(self, db_embedding: np.ndarray, new_embedding: np.ndarray) -> Any:
         if new_embedding.shape != db_embedding.shape:
             raise ValueError("Different shapes of embeddings")
 

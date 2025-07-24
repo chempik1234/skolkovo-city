@@ -17,6 +17,7 @@ x-bot-template: &bot-template
   restart: unless-stopped
   env_file:
     - ../config/.env
+    - ../config/.env.rate_limiter
   healthcheck:
     test: [ "CMD", "curl", "-f", "http://localhost:5000/metrics" ]
     interval: 30s

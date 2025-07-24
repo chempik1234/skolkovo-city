@@ -8,6 +8,7 @@ from ai_utils import embedding_from_bytes
 from services.ai_chat.repositories.ai_chat.base import AiChatRepositoryBase
 from services.ai_chat.repositories.question_lookup.base import QuestionLookupRepositoryBase
 from services.ai_chat.repositories.questions_storage.base import QuestionsStorageRepositoryBase
+from services.rate_limiter.service import RateLimiterService
 
 logger = structlog.get_logger("services.ai_chat")
 
@@ -17,10 +18,12 @@ class AiChatService:
                  ai_chat_repo: AiChatRepositoryBase,
                  question_lookup_repo: QuestionLookupRepositoryBase,
                  questions_storage_repo: QuestionsStorageRepositoryBase,
+                 rate_limiter: RateLimiterService,
                  ):
         self.ai_chat_repo = ai_chat_repo
         self.question_lookup_repo = question_lookup_repo
         self.questions_storage_repo = questions_storage_repo
+        self.rate_limiter = rate_limiter
 
     async def get_response(self, telegram_id: int | str, question: str) -> str:
         return await self.ai_chat_repo.get_response(telegram_id, question)
@@ -30,6 +33,8 @@ class AiChatService:
         accepts a question and returns related question and answer from storage, recalculates embeddings when NULL
         if no questions then return ("" "" None)
         """
+        user_embedding = self.question_lookup_repo.get_embedding(user_question)
+
         async def process_question(question) -> Tuple[np.float64, str, str] | None:
             # get embedding from remote API
             if not question.embedding:
@@ -48,7 +53,7 @@ class AiChatService:
 
             try:
                 return (
-                    await self.question_lookup_repo.get_similarity(embedding, user_question),
+                    await self.question_lookup_repo.get_similarity(embedding, user_embedding),
                     question.question,
                     question.answer,
                 )
@@ -74,5 +79,9 @@ class AiChatService:
 
         return related_question, answer, max_value
 
-    async def create_new_question(self, question: str) -> None:
-        await self.questions_storage_repo.create_new_question(question)
+    async def create_new_question(self, telegram_id: int | str, question: str) -> None:
+        if await self.rate_limiter.can_user_do_action(telegram_id):
+            await self.questions_storage_repo.create_new_question(question)
+            await self.rate_limiter.increase_counter(telegram_id)
+        else:
+            logger.warning("create new question rate limiter", extra_data={"telegram_id": telegram_id})
