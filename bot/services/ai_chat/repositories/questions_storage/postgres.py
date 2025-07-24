@@ -20,7 +20,7 @@ class QuestionsStorageRepositoryPostgres(PostgresMixin, QuestionsStorageReposito
     async def get_answered_questions(self, language: Language) -> Iterable[QuestionDataModel]:
         if language == LanguageEnum.en:
             return await self.get_objects(or_(QuestionDataModel.answer_en != None, QuestionDataModel.category_id != None))
-        return await self.get_objects(QuestionDataModel.category_id != None)
+        return await self.get_objects(or_(QuestionDataModel.answer_ru != None, QuestionDataModel.category_id != None))
 
     async def set_embedding(self, existing_object: model, embedding: np.ndarray):
         existing_object.embedding = embedding_to_bytes(embedding)
