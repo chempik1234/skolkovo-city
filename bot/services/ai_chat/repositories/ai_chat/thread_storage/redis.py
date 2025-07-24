@@ -5,7 +5,7 @@ from services.redis_mixin import RedisMixin
 
 class ThreadStorageRepositoryRedis(RedisMixin, ThreadStorageRepositoryBase):
     def _key(self, telegram_id: int | str):
-        return f"thread__{telegram_id}__{bot_config.BOT_INSTANCE_NAME}"
+        return f"thread__{telegram_id}"   # __{bot_config.BOT_INSTANCE_NAME}"
 
     async def get_thread_key_for_user(self, telegram_id: int | str) -> str | None:
         result = self.get(self._key(telegram_id))

@@ -1,11 +1,16 @@
 import csv
 import os
 from collections import defaultdict
+from typing import Literal
 
 from init.init_1 import users_service
 from init.init_0 import bot_config
 from models.category import CategoryModel
 from custom_types import Language
+
+
+UnknownMessage = Literal["???"]
+    
 
 
 def load_translations(filepath) -> dict:
@@ -19,7 +24,7 @@ def load_translations(filepath) -> dict:
     word2: {ru: word1, sp: word3}
     word3: {ru: word1, en: word2}
     """
-    result = defaultdict(lambda: defaultdict(lambda: "???", {}), {})
+    result = defaultdict(lambda: defaultdict(lambda: UnknownMessage, {}), {})
     with open(filepath, "r") as file:
         csvreader = csv.reader(file.readlines(), delimiter=",")
 
@@ -29,7 +34,7 @@ def load_translations(filepath) -> dict:
                 languages = row.copy()
                 continue
             for ind, word in enumerate(row):
-                result[word] = defaultdict(lambda: "???", {lang: word for lang, word in zip(languages, row)})
+                result[word] = defaultdict(lambda: UnknownMessage, {lang: word for lang, word in zip(languages, row)})
     return result
 
 
@@ -69,7 +74,8 @@ async def get_language_for_telegram_id(telegram_id: int | str):
 
 
 def translate_string(string: str, language: Language):
-    return TRANSLATIONS[string][language]
+    result = TRANSLATIONS[string][language]
+    return result if result != UnknownMessage else string
 
 
 TRANSLATIONS = load_translations(os.path.join(bot_config.CONFIG_MOUNT_DIR, "translation.csv"))

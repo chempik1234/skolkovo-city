@@ -38,7 +38,7 @@ class AiChatService:
 
         if no questions then return ("" "" None)
         """
-        user_embedding = await self.question_lookup_repo.get_embedding(user_question)
+        user_embedding = await self.question_lookup_repo.get_embedding(user_question.lower())
 
         async def process_question(question) -> Tuple[np.float64, Question] | None:
             # get embedding from remote API
@@ -46,7 +46,7 @@ class AiChatService:
                 logger.info("new embedding for question", extra_data={"question_id": question.id})
 
                 try:
-                    embedding = await self.question_lookup_repo.get_embedding(question.question)
+                    embedding = await self.question_lookup_repo.get_embedding(question.question.lower())
                     await self.questions_storage_repo.set_embedding(question, embedding)
                 except Exception as e:
                     logger.error("error while getting embedding for question",

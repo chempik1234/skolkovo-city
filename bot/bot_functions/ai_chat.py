@@ -45,9 +45,10 @@ async def ask_chat_bot(user_id: int | str, question_text: str,
     if not logging_extra:
         logging_extra = get_logging_extra(user_id)
 
+
+    wait_for_answer_message = None
     try:
         wait_for_answer_message = await bot.send_message(chat_id=user_id, text="⏲️")
-
         answer = await ai_chat_service.get_response(user_id, question_text)  # message.from_user.id,
         logger.info("got answer from AI Chatbot", extra_data=logging_extra)
 
@@ -73,8 +74,9 @@ async def ask_chat_bot(user_id: int | str, question_text: str,
 
     except Exception as e:
         logger.error("error while asking AI Chatbot a question", exc_info=e, extra_data={"question": question_text})
-
         await bot.send_message(user_id, _("Не удалось получить ответ на вопрос", language))
+        if wait_for_answer_message:
+            await wait_for_answer_message.delete()
 
 
 async def delete_ai_response_keyboards_from_state(user_id: int | str, state: FSMContext):

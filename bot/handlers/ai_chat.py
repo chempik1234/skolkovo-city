@@ -42,15 +42,7 @@ async def ai_chat_message_handler(message: Message, state: FSMContext):
             await unknown_question(message.chat.id, question_text)
         # we let user say if he likes it
         else:
-            if question.category_id is None:
-                answer = question.answer_ru if language == LanguageEnum.ru else question.answer_en
-                answer_message = await message.answer(text=f"{question}\n\n{answer}",
-                                                    reply_markup=ai_response_keyboard("", language))
-                answer_message_id = answer_message.message_id
-
-                # call after new answer
-                asyncio.create_task(new_answer_message(user_id, question_text, answer_message_id, state))
-            else:
+            if not question.category_id is None:
                 category = await category_service.get_object(question.category_id)
                 try:
                     await send_category(
@@ -63,6 +55,18 @@ async def ai_chat_message_handler(message: Message, state: FSMContext):
                     logging_extra["category_id"] = question.category_id
                     logger.error("error while trying to send category from ai embedding",
                                  logging_extra=logging_extra, exc_info=e)
+
+            if question.category_id is None:
+                answer = question.answer_ru if language == LanguageEnum.ru else question.answer_en
+                answer_message_text = f"{question}\n\n{answer}"
+            else:
+                answer_message_text = _(bot_config.EMBEDDING_CATEGORY_MESSAGE_RU, language)
+            answer_message = await message.answer(text=answer_message_text,
+                                                  reply_markup=ai_response_keyboard("", language))
+            answer_message_id = answer_message.message_id
+
+            # call after new answer
+            asyncio.create_task(new_answer_message(user_id, question_text, answer_message_id, state))
 
     except Exception as e:
         logger.error("error while embedding", exc_info=e, extra_data=logging_extra)
