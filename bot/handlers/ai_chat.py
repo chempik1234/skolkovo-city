@@ -58,7 +58,7 @@ async def ai_chat_message_handler(message: Message, state: FSMContext):
 
             if question.category_id is None:
                 answer = question.answer_ru if language == LanguageEnum.ru else question.answer_en
-                answer_message_text = f"{question}\n\n{answer}"
+                answer_message_text = answer
             else:
                 answer_message_text = _(bot_config.EMBEDDING_CATEGORY_MESSAGE_RU, language)
             answer_message = await message.answer(text=answer_message_text,
