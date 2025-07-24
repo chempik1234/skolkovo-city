@@ -11,6 +11,7 @@ from yandex_cloud_ml_sdk._threads.thread import AsyncThread
 from yandex_cloud_ml_sdk._types.expiration import ExpirationPolicy
 
 from init.init_0 import bot_config
+from retry import retry_async
 from .base import AiChatRepositoryBase
 from .thread_storage.base import ThreadStorageRepositoryBase
 
@@ -50,7 +51,7 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         self.tools = tools + [
             self.sdk.tools.function(
                 name="_get_chat_story",
-                description="If user asks you about context (chat story) or makes a following question, read it here",
+                description="read chat story here if needed",
                 parameters={
                     "type": "object",
                     "properties": {},
@@ -104,6 +105,18 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
         thread = await self.get_thread_for_user(telegram_id)
 
+
+        # Wait for our turn in this queue
+        last_run = 1
+        while last_run:
+            try:
+                last_run = await self.sdk.runs.get_last_by_thread(thread.id)
+            except:  # this occurs if no runs
+                last_run = None
+
+            if last_run:
+                await last_run.wait()
+
         # We need to know if NEWEST system prompt was deployed, so we check it's version (LATEST ENTRANCE)
         await self.update_thread_system_message(thread)
 
@@ -117,7 +130,7 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         async for event in run:
             if event.tool_calls:
                 tool_results = await self.tool_processor(event.tool_calls, thread, telegram_id)
-                await run.submit_tool_results(tool_results)
+                await retry_async(run.submit_tool_results, function_args=(tool_results,), tries=3)
 
         return event.text
 

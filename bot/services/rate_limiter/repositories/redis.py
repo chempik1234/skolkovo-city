@@ -48,4 +48,5 @@ class RateLimiterRepositoryRedisFixedWindow(RedisMixin, RateLimiterRepositoryBas
         else:
             window_start = float(window_start)
             time_till_window_end = int(window_start + self.window_period_seconds - datetime.timestamp(datetime.now()))
+
         self.set(self._key_counter(telegram_id, name), counter_value + 1, ex=time_till_window_end)

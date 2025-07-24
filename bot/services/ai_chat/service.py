@@ -9,6 +9,7 @@ from models.ai_chat import Question
 from services.ai_chat.repositories.ai_chat.base import AiChatRepositoryBase
 from services.ai_chat.repositories.question_lookup.base import QuestionLookupRepositoryBase
 from services.ai_chat.repositories.questions_storage.base import QuestionsStorageRepositoryBase
+from services.rate_limiter.repositories.base import RateLimiterException
 from services.rate_limiter.service import RateLimiterService
 from custom_types import Language, LanguageEnum
 
@@ -20,15 +21,22 @@ class AiChatService:
                  ai_chat_repo: AiChatRepositoryBase,
                  question_lookup_repo: QuestionLookupRepositoryBase,
                  questions_storage_repo: QuestionsStorageRepositoryBase,
-                 rate_limiter: RateLimiterService,
+                 save_question_rate_limiter: RateLimiterService,
+                 ask_ai_rate_limiter: RateLimiterService,
                  ):
         self.ai_chat_repo = ai_chat_repo
         self.question_lookup_repo = question_lookup_repo
         self.questions_storage_repo = questions_storage_repo
-        self.rate_limiter = rate_limiter
+        self.save_question_rate_limiter = save_question_rate_limiter
+        self.ask_ai_rate_limiter = ask_ai_rate_limiter
 
     async def get_response(self, telegram_id: int | str, question: str) -> str:
-        return await self.ai_chat_repo.get_response(telegram_id, question)
+        if await self.ask_ai_rate_limiter.can_user_do_action(telegram_id):
+            asyncio.create_task(self.ask_ai_rate_limiter.increase_counter(telegram_id))
+            return await self.ai_chat_repo.get_response(telegram_id, question)
+        else:
+            logger.warning("create new question rate limiter", extra_data={"telegram_id": telegram_id})
+            raise RateLimiterException()
 
     async def get_related_question_from_db(self, user_question: str, language: Language) -> Tuple[Question | None, np.float64 | None]:
         """
@@ -83,8 +91,8 @@ class AiChatService:
         return question, max_value
 
     async def create_new_question(self, telegram_id: int | str, question: str) -> None:
-        if await self.rate_limiter.can_user_do_action(telegram_id):
+        if await self.save_question_rate_limiter.can_user_do_action(telegram_id):
             await self.questions_storage_repo.create_new_question(question)
-            await self.rate_limiter.increase_counter(telegram_id)
+            await self.save_question_rate_limiter.increase_counter(telegram_id)
         else:
             logger.warning("create new question rate limiter", extra_data={"telegram_id": telegram_id})

@@ -22,7 +22,13 @@ rate_limiter_repo_create_questions = RateLimiterRepositoryRedisFixedWindow(
     window_period_seconds=bot_config.RATE_LIMITER_SAVE_QUESTION_FIXED_WINDOW_SECONDS,
     max_counter_value=bot_config.RATE_LIMITER_SAVE_QUESTION_FIXED_WINDOW_MAX_COUNTER
 )
+rate_limiter_repo_ask_ai = RateLimiterRepositoryRedisFixedWindow(
+    redis_conn_users,
+    window_period_seconds=bot_config.RATE_LIMITER_AI_CHAT_FIXED_WINDOW_SECONDS,
+    max_counter_value=bot_config.RATE_LIMITER_AI_CHAT_FIXED_WINDOW_MAX_COUNTER,
+)
 rate_limiter_service_create_questions = RateLimiterService(rate_limiter_repo_create_questions, "create_questions")
+rate_limiter_service_ask_ai = RateLimiterService(rate_limiter_repo_ask_ai, "ask_ai")
 
 events_repo = EventsRepositoryHTTP("https://api.events.sk.ru/event/list")
 events_service = EventsService(events_repo)
@@ -121,5 +127,6 @@ ai_chat_repo = AiChatRepositoryYandexCloud(yandex_ai_sdk, model, function_map, t
 ai_chat_service = AiChatService(ai_chat_repo=ai_chat_repo,
                                 question_lookup_repo=question_lookup_repo,
                                 questions_storage_repo=question_storage_repo,
-                                rate_limiter=rate_limiter_service_create_questions,
+                                save_question_rate_limiter=rate_limiter_service_create_questions,
+                                ask_ai_rate_limiter=rate_limiter_service_ask_ai,
                                 )
