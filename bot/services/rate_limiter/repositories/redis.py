@@ -27,7 +27,7 @@ class RateLimiterRepositoryRedisFixedWindow(RedisMixin, RateLimiterRepositoryBas
         return counter_value < self.max_counter_value
 
     async def increase_counter(self, telegram_id: int | str, name: str) -> None:
-        if not self.can_user_do_action(telegram_id, name):
+        if not await self.can_user_do_action(telegram_id, name):
             raise RateLimiterException()
 
         counter_value = self.get(self._key_counter(telegram_id, name))
