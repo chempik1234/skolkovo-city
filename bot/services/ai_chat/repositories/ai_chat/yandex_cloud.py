@@ -51,11 +51,14 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
     async def setup(self):
         if not self.tools:
-            await self.create_tools(self.pre_tools)
+            await self.create_tools()
         if not self.assistant:
             await self.create_assistant()
 
-    async def create_tools(self, tools):
+    async def create_tools(self, tools: list | None = None):
+        if not tools:
+            tools = self.pre_tools
+
         self.tools = tools + [
             self.sdk.tools.function(
                 name="_get_chat_story",
@@ -189,6 +192,15 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
                     {"role": "user",
                      "text": text}
                 )
+
+    async def delete_all_search_indexes(self):
+        logger.info("search index erasing begin")
+        async for search_index in self.sdk.search_indexes.list():
+            await search_index.delete()
+
+        await self.create_tools()
+        await self.assistant.update(tools=self.tools)  # without any search indexes
+        logger.info("search index erasing finished")
 
     async def upload_questions_for_search(self, questions: Iterable[QuestionDataModel]):
         logger.info("search index preparations begin")

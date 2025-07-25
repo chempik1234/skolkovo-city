@@ -109,3 +109,6 @@ class AiChatService:
                 search_among_non_category=True, search_among_category=True, all_languages=True,
             )
         )
+
+    async def delete_all_search_indexes(self):
+        await self.ai_chat_repo.delete_all_search_indexes()

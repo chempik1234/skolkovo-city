@@ -13,6 +13,7 @@ from config import NewsForm, States
 from init import category_service, users_service, reloader_service
 from init.ai_chat_service import ai_chat_service
 from init.init_0 import BOT_ROOT_CATEGORY
+from keyboards import yes_no_keyboard
 from utils import get_logging_extra
 
 logger = structlog.get_logger(name="commands")
@@ -89,21 +90,44 @@ async def command_news(message: Message, state: FSMContext):
         await state.set_state(NewsForm.waiting_for_content)
 
 
-@router.message(Command(commands=["search_index"]))
+@router.message(Command(commands=["search_index_upload"]))
 async def command_reload(message: Message, state: FSMContext):
     user_id = message.from_user.id
     logging_extra = get_logging_extra(user_id)
 
-    logger.info("/search_index command", extra_data=logging_extra)
+    logger.info("/search_index_upload command", extra_data=logging_extra)
 
     try:
         is_admin = await users_service.is_admin(user_id)
     except Exception as e:
-        logger.error("error while trying to /search_index", extra_data=logging_extra, exc_info=e)
+        logger.error("error while trying to /search_index_upload", extra_data=logging_extra, exc_info=e)
         return
 
     if is_admin:
-        asyncio.create_task(ai_chat_service.upload_questions_for_search())
+        await state.set_state(States.ai_upload_index_confirmation)
         await message.answer(
-            "Задача поставлена, но это будет долго и дорого"
+            "🚨🚨🚨 Опасно!\n\nЭто дорогая операция (не меньше 500₽)! Вы точно уверены?",
+            reply_markup=yes_no_keyboard,
+        )
+
+
+@router.message(Command(commands=["search_index_delete_all"]))
+async def command_delete_all_search_indexes(message: Message, state: FSMContext):
+    user_id = message.from_user.id
+    logging_extra = get_logging_extra(user_id)
+
+    logger.info("/search_index_upload command", extra_data=logging_extra)
+
+    try:
+        is_admin = await users_service.is_admin(user_id)
+    except Exception as e:
+        logger.error("error while trying to /search_index_upload", extra_data=logging_extra, exc_info=e)
+        return
+
+    if is_admin:
+        await state.set_state(States.ai_delete_indexes_confirmation)
+        await message.answer(
+            "🚨🚨🚨 Опасно!\n\n Бот больше не сможет искать какую-либо информацию о сколково, а вернуть индексы -"
+            " дорогая операция (не меньше 500₽)! Вы точно уверены?",
+            reply_markup=yes_no_keyboard,
         )

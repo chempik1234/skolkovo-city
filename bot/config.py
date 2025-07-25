@@ -86,6 +86,8 @@ class States(StatesGroup):
     category = State()
     ai_embedding = State()
     ai_chat = State()
+    ai_upload_index_confirmation = State()
+    ai_delete_indexes_confirmation = State()
 
 
 class NewsForm(StatesGroup):

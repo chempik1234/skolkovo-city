@@ -3,6 +3,8 @@ set_state(
   States.category - ходим по кнопочкам структуры бота, выводим тексты, ссылки, карты
   States.ai_chat - разговор с ИИ (принимается текст)
   States.ai_embedding - тупой поиск вопросов по БД
+  States.ai_upload_index_confirmation - ожидание подтверждения пересоздания поискового индекса (это дорого)
+  States.ai_delete_indexes_confirmation - ожидание подтверждения удаления всех поисковых индексов
   NewsForm.waiting_for_content - ждём сообщение которое надо разослать
   NewsForm.waiting_for_confirmation - ждём подтверждения этого сообщения (если "нет", снова waiting_for_content)
   # States.choose_language - выбираем язык
