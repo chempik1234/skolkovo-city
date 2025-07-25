@@ -139,11 +139,11 @@ async def ai_update_index_confirm(callback: CallbackQuery, state: FSMContext):
             return
 
         if is_admin:
-            await state.set_state(States.default)
             asyncio.create_task(ai_chat_service.upload_questions_for_search())
             await callback.message.answer(
                 "Задача поставлена на фоновое выполнение."
             )
+    await state.set_state(States.default)
     await callback.message.delete()
 
 
@@ -163,11 +163,11 @@ async def ai_delete_index_confirm(callback: CallbackQuery, state: FSMContext):
             return
 
         if is_admin:
-            await state.set_state(States.default)
             asyncio.create_task(ai_chat_service.upload_questions_for_search())
             await callback.message.answer(
                 "Задача поставлена на фоновое выполнение."
             )
+    await state.set_state(States.default)
     await callback.message.delete()
 
 
