@@ -1,20 +1,16 @@
 import asyncio
 
-import numpy
 import structlog
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
-from bot_functions.ai_chat import unknown_question, ask_chat_bot, new_answer_message
-from bot_functions.category import send_category
+from bot_functions.ai_chat import unknown_question
+from bot_functions.ai_chat_ask import ask_chat_bot
 from config import States
-from init import category_service, users_service
-from init.init_0 import bot_config
-from init.init_2 import ai_chat_service, bot
-from keyboards import ai_response_keyboard
+from init import users_service
+from init.init_2 import ai_chat_service
 from translation import translate_string as _, get_language_for_telegram_id as _l
-from custom_types import LanguageEnum
 from utils import get_logging_extra
 
 logger = structlog.get_logger(name="handlers.ai_chat")
@@ -30,57 +26,19 @@ async def ai_chat_message_handler(message: Message, state: FSMContext):
     logging_extra = get_logging_extra(user_id)
     logging_extra["question"] = question_text
 
-    language = await _l(user_id)
-
-    try:
-        logger.info("question for embedding", extra_data=logging_extra)
-
-        found_answer = True
-
-        question, value = await ai_chat_service.get_related_question_from_db(question_text, language,
-                                                                             search_among_category=True)
-        # we know bot categories don't show the full information
-        if not value or isinstance(value, numpy.float64) and float(value) < bot_config.EMBEDDING_THRESHOLD:
-            question, value = await ai_chat_service.get_related_question_from_db(question_text, language,
-                                                                                 search_among_non_category=True)
-            # if there are no answers at all
-            if not value or isinstance(value, numpy.float64) and float(value) < bot_config.EMBEDDING_THRESHOLD:
-                await unknown_question(message.chat.id, question_text)
-                found_answer = False
+    await ask_chat_bot(user_id, question_text, logging_extra, state, False)
 
 
-        # we let user say if he likes it
-        if found_answer:
-            if not question.category_id is None:
-                category = await category_service.get_object(question.category_id)
-                try:
-                    await send_category(
-                        category_message=None,
-                        chat_id=user_id,
-                        category=category,
-                        state=state,
-                    )
-                except Exception as e:
-                    logging_extra["category_id"] = question.category_id
-                    logger.error("error while trying to send category from ai embedding",
-                                 logging_extra=logging_extra, exc_info=e)
+@router.message(States.ai_chat)
+async def ai_chat_message_handler(message: Message, state: FSMContext):
+    question_text = message.text
 
-            if question.category_id is None:
-                answer = question.answer_ru if language == LanguageEnum.ru else question.answer_en
-                answer_message_text = answer
-            else:
-                answer_message_text = _(bot_config.EMBEDDING_CATEGORY_MESSAGE_RU, language)
-            answer_message = await message.answer(text=answer_message_text,
-                                                  reply_markup=ai_response_keyboard("", language))
-            answer_message_id = answer_message.message_id
+    user_id = message.from_user.id
+    logging_extra = get_logging_extra(user_id)
+    logging_extra["question"] = question_text
 
-            # call after new answer
-            asyncio.create_task(new_answer_message(user_id, question_text, answer_message_id, state))
-
-    except Exception as e:
-        logger.error("error while embedding", exc_info=e, extra_data=logging_extra)
-
-        await message.answer(_("Не удалось получить ответ на вопрос", language))
+    await state.set_state(States.ai_embedding)  # don't let the dialogue go on
+    await ask_chat_bot(user_id, question_text, logging_extra, state, True)
 
 
 @router.callback_query(F.data.startswith("bad_answer_"))
@@ -179,6 +137,6 @@ async def ai_chat_bot_message_handler(message: Message, state: FSMContext):
 
     logging_extra["question"] = question_text
 
-    logger.info("asked chat bot", extra_data=logging_extra)
+    logger.info("asked chat bot from somewhere", extra_data=logging_extra)
 
     await ask_chat_bot(user_id, question_text, logging_extra, state)
