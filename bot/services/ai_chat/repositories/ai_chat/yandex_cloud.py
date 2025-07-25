@@ -39,20 +39,33 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
         self.pre_tools = tools
 
-        self._system_prompts_version = 3
+        self._system_prompts_version = 4.1
         self._system_prompts = [
             f"version_{self._system_prompts_version}",
             "Пользователь задаёт вопросы, которых не нашлось в базе эмбеддингов.",
+
             "В первую очередь используй инструменты такие как обращения к внешним API и только "
-            "если они не потребуются используй базу знаний. Обязательно в конце ответа пиши нужно ли было использовать "
-            "внешние API и использовал ли ты функции которые к ним обращаются",
+            "если они не потребуются используй базу знаний. Если ты использовал внешние API, скажи об этом в конце "
+            "сообщения",
+
+            "Даже не думай просить пользователя самого искать ответы через API или обращаться к твоим функциям - они к "
+            "ним не имеют доступа и не знают про них ничего, твоя задача - ими воспользоваться. Если уж тебе пришёл "
+            "ответ с ошибкой - сообщи пользователю прямо какой json или просто сообщение тебе пришло, но не должно "
+            "быть таких ситуаций, когда ты можешь получение данных требует использования API, а ты не стал его делать",
+
+            "Если в сообщении пользователь просит дать ему данные, ты должен отправить сообщение, содержащее их, "
+            "например для списка мероприятий отдать данные полученные из API",
+
             "Попробуй ответить сам, и если не сможешь, то переведи на колл-центр +74959560033. "
             "Вопросы, не связанные с Сколково или важными темами такими как первая помощь,"
             "должны быть помечены словом 'Нерелевантно' в начале ответа",
+
             "Пиши кратко и по делу, в формате Markdown под мессенджер телеграм. ",
+
             "Если пользователь просит узнать актуальные данные (например, погоду или мероприятия), "
             "ни за что не смей брать ответ из своих поисковых индексов, например говорить, "
             "что метеоданных нет в базе - используй инструменты Function Tools",
+
             "If the question is in english, you must answer in english! "
             "Use the same language as the question is written in, for example if user asks in russian, speak russian;"
             "if user asks in english then speak english"
@@ -89,11 +102,15 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         self.assistant = await self.sdk.assistants.create(self.model, tools=self.tools)
 
     async def get_thread_for_user(self, telegram_id: int | str) -> AsyncThread:
-        existing_thread_key: str | None = await self.threads_storage_repo.get_thread_key_for_user(telegram_id)
-        if existing_thread_key is None:
-            thread = await self.create_thread(telegram_id)
-        else:
+        existing_thread_key: str | None = await self.threads_storage_repo.get_thread_key_for_user(telegram_id,
+                                                                                                  update_expiracy=True)
+
+        thread = None
+        if not existing_thread_key is None:
             thread = await self.get_thread(existing_thread_key)
+
+        if thread is None:  # is still None, maybe key is expired
+            thread = await self.create_thread(telegram_id)
 
         return thread
 
@@ -105,6 +122,9 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
             return thread
         except:  # nah I don't know any other way to know
             return None
+
+    async def set_thread(self, telegram_id, thread: AsyncThread):
+        await self.threads_storage_repo.set_thread_key_for_user(telegram_id, thread.id)
 
     async def create_thread(self, telegram_id: int | str) -> AsyncThread:
         timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -150,6 +170,7 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         run = await self.assistant.run_stream(thread)
         event = None
         async for event in run:
+            print("SOSAL", event, event.tool_calls)
             if event.tool_calls:
                 tool_results = await self.tool_processor(event.tool_calls, thread, telegram_id)
                 await retry_async(run.submit_tool_results, function_args=(tool_results,), tries=3)
@@ -159,6 +180,7 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
     async def tool_processor(self, tool_calls, thread: AsyncThread, telegram_id: int | str):
         result = []
         for tool_call in tool_calls:
+            print(tool_call, "SOSAL")
             assert tool_call.function
 
             arguments = tool_call.function.arguments
@@ -179,8 +201,8 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         return result
 
     async def _get_chat_story(self, thread: AsyncThread, *args, **kwargs) -> str:
-        result = [message.text async for message in thread if not message.text in self._system_prompts]
-        assert all(not i in self._system_prompts for i in result)
+        result = [message.text async for message in thread]  #  if not message.text in self._system_prompts]
+        # assert all(not i in self._system_prompts for i in result)
         if result:
             return "\n\nnext_data_piece:\n\n".join(result)
         return "empty data, brand new thread"
@@ -191,11 +213,12 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
             if not isinstance(version, int):
                 message_text = message.text
                 version = message_text.replace("version_", "", 1) if message_text.startswith("version_") else None
-                if isinstance(version, str) and version.isdigit() and version:
-                    version = int(version)
+                try:
+                    version = float(version)
+                except:
+                    pass
 
-        if not isinstance(version, int) or isinstance(version,
-                                                      int) and version < self._system_prompts_version:  # <-- Hardcoded number
+        if not isinstance(version, float) or isinstance(version, float) and version < self._system_prompts_version:  # <-- Hardcoded number
             for text in self._system_prompts:
                 await thread.write(
                     {"role": "assistant",

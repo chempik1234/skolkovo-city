@@ -8,13 +8,13 @@ class EventsRepositoryHTTP(EventsRepositoryBase):
     def __init__(self, url: str):
         self.url = url
 
-    async def get_events_list(self, start_date: str, page: int, all_: int = 0):
+    async def get_events_list(self, start_date: str, page: int, size: int):
         params = {
             "StartDate": start_date,
             "page": page,
-            "all": all_
+            "size": size
         }
         response = requests.get(self.url, params=params)
         result = response.json()
-        result["data"] = result["data"][: 2]
+        result["data"] = result["data"]
         return result
