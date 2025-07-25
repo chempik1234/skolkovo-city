@@ -7,7 +7,10 @@ from db.models import QuestionDataModel
 
 
 class QuestionsStorageRepositoryBase:
-    async def get_answered_questions(self, language: Language) -> Iterable[QuestionDataModel]:
+    async def get_answered_questions(self, language: Language,
+                                     search_among_category: bool = False,
+                                     search_among_non_category: bool = False,
+                                     all_languages: bool = False) -> Iterable[QuestionDataModel]:
         raise NotImplementedError()
 
     async def set_embedding(self, existing_object: QuestionDataModel, embedding: np.ndarray):

@@ -1,3 +1,5 @@
+import asyncio
+
 import structlog
 
 from aiogram import Router
@@ -9,6 +11,7 @@ from bot_functions.category import handle_category
 from bot_functions.settings import make_user_choose_language
 from config import NewsForm, States
 from init import category_service, users_service, reloader_service
+from init.ai_chat_service import ai_chat_service
 from init.init_0 import BOT_ROOT_CATEGORY
 from utils import get_logging_extra
 
@@ -84,3 +87,23 @@ async def command_news(message: Message, state: FSMContext):
             "📢 Отправьте сообщение для рассылки (текст, фото, видео, gif):"
         )
         await state.set_state(NewsForm.waiting_for_content)
+
+
+@router.message(Command(commands=["search_index"]))
+async def command_reload(message: Message, state: FSMContext):
+    user_id = message.from_user.id
+    logging_extra = get_logging_extra(user_id)
+
+    logger.info("/search_index command", extra_data=logging_extra)
+
+    try:
+        is_admin = await users_service.is_admin(user_id)
+    except Exception as e:
+        logger.error("error while trying to /search_index", extra_data=logging_extra, exc_info=e)
+        return
+
+    if is_admin:
+        asyncio.create_task(ai_chat_service.upload_questions_for_search())
+        await message.answer(
+            "Задача поставлена, но это будет долго и дорого"
+        )

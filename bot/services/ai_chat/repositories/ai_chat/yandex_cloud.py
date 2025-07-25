@@ -1,6 +1,7 @@
 import asyncio
+import json
 from datetime import datetime
-from typing import Callable, Any, Awaitable, Dict, Coroutine
+from typing import Callable, Any, Awaitable, Dict, Coroutine, Iterable
 
 import structlog
 from yandex_cloud_ml_sdk import AsyncYCloudML
@@ -10,6 +11,7 @@ from yandex_cloud_ml_sdk._models.completions.result import Alternative
 from yandex_cloud_ml_sdk._threads.thread import AsyncThread
 from yandex_cloud_ml_sdk._types.expiration import ExpirationPolicy
 
+from db.models import QuestionDataModel
 from init.init_0 import bot_config
 from retry import retry_async
 from .base import AiChatRepositoryBase
@@ -22,7 +24,7 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
     def __init__(self, sdk: AsyncYCloudML, model: GPTModel,
                  function_map: Dict[str, Callable[[Any, Any], Awaitable[Any]]],
                  threads_storage_repo: ThreadStorageRepositoryBase,
-                 tools):
+                 tools: list):
         """
         Create Yandex cloud async assistant from model
         :param function_map: ``dict`` object for tools, don't use keys starting with ``'_'``, that's for class methods
@@ -35,7 +37,7 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
         self.tools = []
 
-        self.create_tools(tools)
+        self.pre_tools = tools
 
         self._system_prompts_version = 1
         self._system_prompts = [
@@ -47,7 +49,13 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
             "Use the same language as the question is written in"
         ]
 
-    def create_tools(self, tools):
+    async def setup(self):
+        if not self.tools:
+            await self.create_tools(self.pre_tools)
+        if not self.assistant:
+            await self.create_assistant()
+
+    async def create_tools(self, tools):
         self.tools = tools + [
             self.sdk.tools.function(
                 name="_get_chat_story",
@@ -60,6 +68,10 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
             ),
         ]
         self.function_map["_get_chat_story"] = self._get_chat_story
+
+        async for index in self.sdk.search_indexes.list():
+            new_tool = self.sdk.tools.search_index(index)
+            self.tools.append(new_tool)
 
     async def create_assistant(self):
         self.assistant = await self.sdk.assistants.create(self.model, tools=self.tools)
@@ -100,11 +112,9 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         return thread
 
     async def get_response(self, telegram_id: int | str, question: str) -> str:
-        if not self.assistant:
-            await self.create_assistant()
+        await self.setup()
 
         thread = await self.get_thread_for_user(telegram_id)
-
 
         # Wait for our turn in this queue
         last_run = 1
@@ -143,16 +153,17 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
             function_name = tool_call.function.name
 
-            # use user_id for context
-            if function_name.startswith("_"):
-                arguments["telegram_id"] = telegram_id
-                arguments["thread"] = thread
+            if function_name in self.function_map:
+                # use user_id for context
+                if function_name.startswith("_"):
+                    arguments["telegram_id"] = telegram_id
+                    arguments["thread"] = thread
 
-            function = self.function_map[function_name]
+                function = self.function_map[function_name]
 
-            answer = str(await function(**arguments))  # type: ignore[operator]
+                answer = str(await function(**arguments))  # type: ignore[operator]
 
-            result.append({'name': tool_call.function.name, 'content': answer})
+                result.append({'name': tool_call.function.name, 'content': answer})
         return result
 
     async def _get_chat_story(self, thread: AsyncThread, *args, **kwargs) -> str:
@@ -171,9 +182,53 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
                 if isinstance(version, str) and version.isdigit() and version:
                     version = int(version)
 
-        if not isinstance(version, int) or isinstance(version, int) and version < self._system_prompts_version:  # <-- Hardcoded number
+        if not isinstance(version, int) or isinstance(version,
+                                                      int) and version < self._system_prompts_version:  # <-- Hardcoded number
             for text in self._system_prompts:
                 await thread.write(
                     {"role": "user",
                      "text": text}
                 )
+
+    async def upload_questions_for_search(self, questions: Iterable[QuestionDataModel]):
+        logger.info("search index preparations begin")
+
+        # Serialize questions into json
+        file_content = []
+
+        for question in questions:
+            content = {
+                "question": question.question,
+                "answer_ru": question.answer_ru,
+                "answer_en": question.answer_en,
+                "category_id": question.category_id
+            }
+            file_content.append(json.dumps(content, ensure_ascii=False))
+
+        text_data = "\n".join(file_content)
+        file_bytes = text_data.encode('utf-8')
+
+        # Upload file and wait
+        file = await self.sdk.files.upload_bytes(
+            data=file_bytes,
+            name="questions_database.txt",
+            mime_type="text/plain"
+        )
+
+        operation = await self.sdk.search_indexes.create_deferred(
+            name=f"skolkovo_questions_database_{datetime.today().strftime('%Y_%m_%d_%H_%M_%S')}",
+            files=file,
+            expiration_policy=ExpirationPolicy.SINCE_LAST_ACTIVE,
+            ttl_days=1,
+        )
+        search_index = await operation.wait()
+
+        logger.info("search index uploaded")
+
+        # Add tool
+        await self.setup()
+
+        all_tools = list(self.tools) + [self.sdk.tools.search_index(search_index)]
+        await self.assistant.update(tools=all_tools)
+
+        logger.info("search index tool acquired")

@@ -35,13 +35,22 @@ async def ai_chat_message_handler(message: Message, state: FSMContext):
     try:
         logger.info("question for embedding", extra_data=logging_extra)
 
-        question, value = await ai_chat_service.get_related_question_from_db(question_text, language)  # message.from_user.id,
+        found_answer = True
 
-        # we know it's a bad answer
+        question, value = await ai_chat_service.get_related_question_from_db(question_text, language,
+                                                                             search_among_category=True)
+        # we know bot categories don't show the full information
         if not value or isinstance(value, numpy.float64) and float(value) < bot_config.EMBEDDING_THRESHOLD:
-            await unknown_question(message.chat.id, question_text)
+            question, value = await ai_chat_service.get_related_question_from_db(question_text, language,
+                                                                                 search_among_non_category=True)
+            # if there are no answers at all
+            if not value or isinstance(value, numpy.float64) and float(value) < bot_config.EMBEDDING_THRESHOLD:
+                await unknown_question(message.chat.id, question_text)
+                found_answer = False
+
+
         # we let user say if he likes it
-        else:
+        if found_answer:
             if not question.category_id is None:
                 category = await category_service.get_object(question.category_id)
                 try:

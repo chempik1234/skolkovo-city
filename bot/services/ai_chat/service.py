@@ -38,7 +38,12 @@ class AiChatService:
             logger.warning("create new question rate limiter", extra_data={"telegram_id": telegram_id})
             raise RateLimiterException()
 
-    async def get_related_question_from_db(self, user_question: str, language: Language) -> Tuple[Question | None, np.float64 | None]:
+    async def get_related_question_from_db(
+            self,
+            user_question: str,
+            language: Language,
+            search_among_category: bool = False,
+    ) -> Tuple[Question | None, np.float64 | None]:
         """
         accepts a question and returns related question and answer from storage, recalculates embeddings when NULL
 
@@ -58,7 +63,7 @@ class AiChatService:
                     await self.questions_storage_repo.set_embedding(question, embedding)
                 except Exception as e:
                     logger.error("error while getting embedding for question",
-                                 extra_data={"question_id": question.id}, exc_info=e)
+                                 extra_data={"question": question}, exc_info=e)
                     return None
             # or get from cache e.g. Postgres
             else:
@@ -74,7 +79,8 @@ class AiChatService:
                              extra_data={"question_id": question.id, 'user_question': user_question}, exc_info=e)
                 return None
 
-        questions = await self.questions_storage_repo.get_answered_questions(language=language)
+        questions = await self.questions_storage_repo.get_answered_questions(language=language,
+                                                                             search_among_category=search_among_category)
 
         similarities = await asyncio.gather(
             *[process_question(question) for question in questions]
@@ -96,3 +102,10 @@ class AiChatService:
             await self.save_question_rate_limiter.increase_counter(telegram_id)
         else:
             logger.warning("create new question rate limiter", extra_data={"telegram_id": telegram_id})
+
+    async def upload_questions_for_search(self):
+        await self.ai_chat_repo.upload_questions_for_search(
+            await self.questions_storage_repo.get_answered_questions(
+                search_among_non_category=True, search_among_category=True, all_languages=True,
+            )
+        )
