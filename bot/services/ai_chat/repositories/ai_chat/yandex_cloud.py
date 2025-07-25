@@ -39,14 +39,23 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
 
         self.pre_tools = tools
 
-        self._system_prompts_version = 1
+        self._system_prompts_version = 3
         self._system_prompts = [
             f"version_{self._system_prompts_version}",
-            "Пользователь задаёт вопросы, которых не нашлось в базе эмбеддингов."
-            "Попробуй ответить на него сам, и если не сможешь, то переведи на колл-центр +74959560033. "
+            "Пользователь задаёт вопросы, которых не нашлось в базе эмбеддингов.",
+            "В первую очередь используй инструменты такие как обращения к внешним API и только "
+            "если они не потребуются используй базу знаний. Обязательно в конце ответа пиши нужно ли было использовать "
+            "внешние API и использовал ли ты функции которые к ним обращаются",
+            "Попробуй ответить сам, и если не сможешь, то переведи на колл-центр +74959560033. "
+            "Вопросы, не связанные с Сколково или важными темами такими как первая помощь,"
+            "должны быть помечены словом 'Нерелевантно' в начале ответа",
             "Пиши кратко и по делу, в формате Markdown под мессенджер телеграм. ",
+            "Если пользователь просит узнать актуальные данные (например, погоду или мероприятия), "
+            "ни за что не смей брать ответ из своих поисковых индексов, например говорить, "
+            "что метеоданных нет в базе - используй инструменты Function Tools",
             "If the question is in english, you must answer in english! "
-            "Use the same language as the question is written in"
+            "Use the same language as the question is written in, for example if user asks in russian, speak russian;"
+            "if user asks in english then speak english"
         ]
 
     async def setup(self):
@@ -189,7 +198,7 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
                                                       int) and version < self._system_prompts_version:  # <-- Hardcoded number
             for text in self._system_prompts:
                 await thread.write(
-                    {"role": "user",
+                    {"role": "assistant",
                      "text": text}
                 )
 

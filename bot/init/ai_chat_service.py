@@ -58,7 +58,7 @@ tools = [
     yandex_ai_sdk.tools.function(
         name="events_list",
         description="получает информацию о событиях, мероприятиях сколково. если спрашивают что-то связанное с ними, "
-                    "обязательно используй",
+                    "ОБЯЗАТЕЛЬНО используй, твоя база знаний в поисковых инструментах бесполезна для пользователей",
         parameters={
             "type": "object",
             "properties": {
@@ -99,7 +99,7 @@ tools = [
     ),
     yandex_ai_sdk.tools.function(
         name="weather",
-        description="Get current weather in Skolkovo (not any other city) in json format from an API",
+        description="Get current weather in Skolkovo (not any other city) in json format from an API. ALWAYS use it if user asks about weather",
         parameters={
             "type": "object",
             "properties": {},

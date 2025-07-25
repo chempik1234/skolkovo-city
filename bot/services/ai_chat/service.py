@@ -43,6 +43,7 @@ class AiChatService:
             user_question: str,
             language: Language,
             search_among_category: bool = False,
+            search_among_non_category: bool = False,
     ) -> Tuple[Question | None, np.float64 | None]:
         """
         accepts a question and returns related question and answer from storage, recalculates embeddings when NULL
@@ -80,7 +81,8 @@ class AiChatService:
                 return None
 
         questions = await self.questions_storage_repo.get_answered_questions(language=language,
-                                                                             search_among_category=search_among_category)
+                                                                             search_among_category=search_among_category,
+                                                                             search_among_non_category=search_among_non_category)
 
         similarities = await asyncio.gather(
             *[process_question(question) for question in questions]
