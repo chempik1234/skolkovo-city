@@ -2,7 +2,7 @@ from django.core.files.storage import default_storage
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 
-from main_app.models import Video
+from main_app.models import Video, Question
 
 
 @receiver(pre_save, sender=Video)
@@ -34,3 +34,12 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
         if default_storage.exists(instance.file.name):
             default_storage.delete(instance.file.name)
 
+
+@receiver(pre_save, sender=Question)
+def delete_embedding_for_question(sender, instance, **kwargs):
+    if instance.id is None:
+        return
+
+    prev_object = Question.objects.get(id=instance.id)
+    if prev_object.question != instance.question:
+        instance.embedding = None
