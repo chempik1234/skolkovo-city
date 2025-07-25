@@ -105,3 +105,4 @@ class QuestionAdmin(admin.ModelAdmin):
         ("answer_ru", admin.EmptyFieldListFilter),
         ("category_id", admin.EmptyFieldListFilter),
     )
+    search_fields = ('question', 'answer_ru', 'answer_en',)
