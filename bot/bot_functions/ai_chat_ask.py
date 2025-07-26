@@ -27,7 +27,7 @@ async def _ask_embedding(
         LanguageEnum.ru
 ) -> Tuple[Question | None, numpy.float64 | None]:
     text_lower = question_text.lower()
-    if any([i in text_lower for i in ["погод", "мероприят", "API", "сегодня", "event", "today", "current", "weath", "this"]]):
+    if any([i in text_lower for i in ["погод", "мероприят", "api", "сегодня", "event", "today", "current", "weath", "this"]]):
         return None, None
 
     found_answer = True
@@ -35,7 +35,7 @@ async def _ask_embedding(
     question, value = await ai_chat_service.get_related_question_from_db(question_text, language,
                                                                          search_among_category=True)
     # we know bot categories don't show the full information
-    if (not value or isinstance(value, numpy.float64) and float(value) < bot_config.EMBEDDING_THRESHOLD):
+    if not value or isinstance(value, numpy.float64) and float(value) < bot_config.EMBEDDING_THRESHOLD:
         question, value = await ai_chat_service.get_related_question_from_db(question_text, language,
                                                                              search_among_non_category=True)
         # if there are no answers at all
