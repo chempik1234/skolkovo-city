@@ -1,5 +1,6 @@
 import asyncio
 
+import structlog
 from aiogram.exceptions import TelegramNetworkError
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, InputMediaPhoto, InputMedia, URLInputFile
@@ -13,7 +14,9 @@ from models.category import CategoryModel
 from translation import (translate_string as _,
                          get_language_for_telegram_id as _l,
                          get_title_description_for_language as _tdl)
-from utils import remove_newline_escapes
+from utils import remove_newline_escapes, get_logging_extra
+
+logger = structlog.get_logger("bot_functions.category")
 
 
 async def delete_media_messages_from_state(state: FSMContext, chat_id: int | str):
@@ -23,16 +26,21 @@ async def delete_media_messages_from_state(state: FSMContext, chat_id: int | str
 
 
 async def send_category(category_message: Message | None, chat_id: int | str | None, category: CategoryModel | None,
-                        state: FSMContext) -> None:
+                        state: FSMContext, logging_extra: dict | None = None) -> None:
     """
     send | update message with category inline buttons
     :param chat_id: send to chat id (not needed if category_message is not None)
     :param category_message: ``None`` or existing Message to edit (if already surfing)
     :param category: ``CategoryModel|None`` parent category to search children for
     :param state: ``FSMContext`` state to use to find media messages to delete
+    :param logging_extra: logging_extra data from the handler, auto-created if None
     :return: None
     """
     telegram_id = chat_id if chat_id is not None else category_message.chat.id
+
+    if logging_extra is None:
+        logging_extra = get_logging_extra(telegram_id)
+
     language = await _l(telegram_id)
 
     if isinstance(category, CategoryModel):
@@ -95,13 +103,16 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
                     video_message = await bot.send_video(send_to, URLInputFile(url, timeout=60))
                     media_messages.append(video_message)
                 except TelegramNetworkError:
-                    message = await bot.send_message(send_to, f"Не удалось отправить видео, откройте по (ссылке)[{url}]",
+                    message = await bot.send_message(send_to, f"{_('Не удалось отправить видео, откройте по (ссылке)', language)}[{url}]",
                                                      parse_mode="Markdown")
                     media_messages.append(message)
 
         if media_group:
-            media_group[0].parse_mode = "Markdown"
-            media_messages.extend(await bot.send_media_group(chat_id=send_to, media=media_group))
+            try:
+                media_group[0].parse_mode = "Markdown"
+                media_messages.extend(await bot.send_media_group(chat_id=send_to, media=media_group))
+            except Exception as e:
+                logger.error("error while sending category media group", extra_Data=logging_extra, exc_info=e)
 
         # store messages ID so we can erase them later
         messages_ids = [i.message_id for i in media_messages]
@@ -114,7 +125,7 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         await category_message.edit_reply_markup(reply_markup=keyboard)
 
 
-async def handle_category(current_category_id, chat_id: int | str | None, category_message, state: FSMContext):
+async def handle_category(current_category_id, chat_id: int | str | None, category_message, state: FSMContext, logging_extra: dict | None = None):
     """
     what if user clicked on a category button?
 
@@ -125,8 +136,12 @@ async def handle_category(current_category_id, chat_id: int | str | None, catego
     :param category_message: ``None`` or existing Message to edit (if already surfing)
     :param current_category_id: new category id (``int|None``)
     :param state: aiogram state to update
+    :param logging_extra: logging_extra data from the handler, auto-created if None
     :return: None
     """
+    if logging_extra is None:
+        logging_extra = get_logging_extra(chat_id)
+
     category = await category_service.get_object(current_category_id)
 
     if bot_config.USE_PROMETHEUS():
@@ -147,4 +162,4 @@ async def handle_category(current_category_id, chat_id: int | str | None, catego
             )
             return
 
-    await send_category(category_message, chat_id, category, state)
+    await send_category(category_message, chat_id, category, state, logging_extra=logging_extra)

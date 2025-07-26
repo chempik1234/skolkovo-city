@@ -27,7 +27,7 @@ async def command_start(message: Message, state: FSMContext):
     try:
         logger.info("/start command", extra_data=logging_extra)
         await handle_category(current_category_id=BOT_ROOT_CATEGORY, chat_id=message.chat.id,
-                              category_message=None, state=state)
+                              category_message=None, state=state, logging_extra=logging_extra)
         await state.set_state(States.default)
     except Exception as e:
         logger.error("error while trying to /start", extra_data=logging_extra, exc_info=e)

@@ -98,7 +98,7 @@ async def ask_chat_bot(user_id: int | str, question_text: str,
             except:
                 answer_message = await send_answer(answer, parse_mode_=None)
         else:
-            await send_category(None, user_id, await category_service.get_object(category_id), state)
+            await send_category(None, user_id, await category_service.get_object(category_id), state, logging_extra)
             answer_message = await bot.send_message(user_id,
                                                     text=_(bot_config.EMBEDDING_CATEGORY_MESSAGE_RU, language))
         await answer_message.edit_reply_markup(reply_markup=ai_response_keyboard("", language))

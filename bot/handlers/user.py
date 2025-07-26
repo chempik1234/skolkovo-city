@@ -89,7 +89,7 @@ async def choose_language_handler(callback: CallbackQuery, state: FSMContext):
         logger.info("moving to /start after changing language",
                      extra_data=logging_extra)
         await handle_category(current_category_id=BOT_ROOT_CATEGORY, chat_id=callback.message.chat.id,
-                              category_message=None, state=state)
+                              category_message=None, state=state, logging_extra=logging_extra)
     except Exception as e:
         logger.error("error while trying to /start after /language",
                       extra_data=logging_extra, exc_info=e)

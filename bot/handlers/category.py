@@ -35,6 +35,6 @@ async def category_callback_handler(callback: CallbackQuery, state: FSMContext):
     try:
         logger.info("handle category click", extra_data=logging_extra)
         await handle_category(current_category_id=category_id, state=state,
-                              category_message=callback.message, chat_id=None)
+                              category_message=callback.message, chat_id=None, logging_extra=logging_extra)
     except Exception as e:
         logger.error("exception while trying to handle category click", extra_data=logging_extra, exc_info=e)
