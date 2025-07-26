@@ -93,6 +93,7 @@ class AiChatService:
         for result in similarities:
             if not isinstance(result, tuple):
                 continue
+            print(result[0], result[1].question)
             if max_value is None or max_value is not None and max_value < result[0]:
                 max_value, question = result
 

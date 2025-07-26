@@ -27,7 +27,7 @@ class QuestionLookupRepository(QuestionLookupRepositoryBase):
     async def get_embedding(self, question: str) -> np.ndarray:
         return self._get_embedding(question)
 
-    def _get_embedding(self, text: str, text_type: str = "doc") -> np.array:
+    def _get_embedding(self, text: str, text_type: str = "query") -> np.array:
         query_data = {
             "modelUri": self.doc_uri if text_type == "doc" else self.query_uri,
             "text": text,
