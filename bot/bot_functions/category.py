@@ -119,9 +119,17 @@ async def send_category(category_message: Message | None, chat_id: int | str | N
         await state.update_data({"media_messages": messages_ids})
 
     if send_media or category_message is None:
-        await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode="Markdown")
+        try:
+            await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode="Markdown")
+        except Exception as e:
+            logger.error("error while sending category message text with markdown", exc_info=e, logging_extra=logging_extra)
+            await bot.send_message(chat_id=send_to, text=text, reply_markup=keyboard, parse_mode=None)
     else:
-        await category_message.edit_text(text=text, parse_mode="Markdown")
+        try:
+            await category_message.edit_text(text=text, parse_mode="Markdown")
+        except Exception as e:
+            logger.error("error while editing category message text with markdown", exc_info=e, logging_extra=logging_extra)
+            await category_message.edit_text(text=text, parse_mode=None)
         await category_message.edit_reply_markup(reply_markup=keyboard)
 
 
