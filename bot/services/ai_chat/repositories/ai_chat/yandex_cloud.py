@@ -170,7 +170,6 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
         run = await self.assistant.run_stream(thread)
         event = None
         async for event in run:
-            print("SOSAL", event, event.tool_calls)
             if event.tool_calls:
                 tool_results = await self.tool_processor(event.tool_calls, thread, telegram_id)
                 await retry_async(run.submit_tool_results, function_args=(tool_results,), tries=3)
@@ -180,7 +179,6 @@ class AiChatRepositoryYandexCloud(AiChatRepositoryBase):
     async def tool_processor(self, tool_calls, thread: AsyncThread, telegram_id: int | str):
         result = []
         for tool_call in tool_calls:
-            print(tool_call, "SOSAL")
             assert tool_call.function
 
             arguments = tool_call.function.arguments
