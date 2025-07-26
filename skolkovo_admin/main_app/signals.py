@@ -2,7 +2,7 @@ from django.core.files.storage import default_storage
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 
-from main_app.models import Video, Question
+from main_app.models import Video, Question, Category
 
 
 @receiver(pre_save, sender=Video)
@@ -43,3 +43,9 @@ def delete_embedding_for_question(sender, instance, **kwargs):
     prev_object = Question.objects.get(id=instance.id)
     if prev_object.question != instance.question:
         instance.embedding = None
+
+
+@receiver(post_save, sender=Category)
+def create_question_for_category(sender, instance, created, **kwargs):
+    if created:
+        Question.objects.create(question=instance.title_ru, category=instance)
